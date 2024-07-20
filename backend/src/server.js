@@ -13,7 +13,7 @@ const port = process.env.PORT || 3000;
 async function startserver(){
     
   await connectToMongo();
-  // socketConnection(server);
+  socketConnection(server);
 
   server.listen(port , ()=>{
     console.log(`[server]: Server is running at http://localhost:${port}`);

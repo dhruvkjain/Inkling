@@ -28,7 +28,7 @@ function Header() {
     }, [])
 
     return (
-        <div className="grid grid-cols-4">
+        <nav className="grid grid-cols-4">
             <div className="h-fit w-fit p-2 col-span-3">
                 <Menubar>
                     {
@@ -51,7 +51,7 @@ function Header() {
             <div className="flex justify-end items-center p-2">
                 <Account />
             </div>
-        </div>
+        </nav>
     )
 }
 

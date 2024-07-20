@@ -24,6 +24,7 @@ function Account() {
   const { submitSignup, submitLogin } = useAuth();
 
   return (
+    <div className="flex justify-center items-center flex-grow">
     <div className="w-full h-full flex items-center justify-center">
       <Tabs defaultValue="signup" className="w-[400px]">
         <TabsList className="grid w-full grid-cols-2">
@@ -100,6 +101,7 @@ function Account() {
           </Card>
         </TabsContent>
       </Tabs>
+    </div>
     </div>
   )
 }

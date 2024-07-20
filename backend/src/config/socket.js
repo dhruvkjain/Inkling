@@ -1,8 +1,7 @@
 const { instrument } = require('@socket.io/admin-ui');
 const { Server } = require('socket.io');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
-// console.log(uuidv4());
+
+const { createRoom } = require('../services/game.services.js');
 
 function socketConnection(server) {
 
@@ -18,7 +17,7 @@ function socketConnection(server) {
     })
 
     io.on('connection', (socket) => {
-        // console.log(socket.id);
+        console.log(socket.id);
 
         socket.on('checkSocketId', (socketId, callback) => {
             const exists = io.sockets.sockets.has(socketId);
@@ -28,6 +27,19 @@ function socketConnection(server) {
         socket.on('send-message', (message, socketId) => {
             console.log(message ,socketId);
             socket.to(socketId).emit('receive-message', message);
+        })
+
+        socket.on('create-room', async(username, profilePic, callback) => {
+            const gameData = await createRoom(username, profilePic);
+            
+            if(gameData.error){
+                console.log(gameData.error);
+                callback(gameData);
+            }
+            else{
+                socket.join(gameData.secretcode);
+                callback(gameData);
+            }
         })
 
         socket.on('join-room', (roomId) => {

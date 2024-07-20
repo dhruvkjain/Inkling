@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Component from './pages/Component.tsx';
+// import Game from './pages/Game.tsx';
+import GameMenu from "./pages/GameMenu.tsx";
 import Account from "./pages/Account.tsx";
 import Header from "./components/Header.tsx";
 import { Toaster } from "@/components/ui/sonner"
@@ -17,16 +18,14 @@ function App() {
     <BrowserRouter>
       <div className="min-h-[100lvh] flex flex-col">
       <Header />
-      <div className="flex-grow flex justify-center items-center">
       <Routes>
         <Route index 
-          element={(authUser === undefined) ? <Account /> : <Component/>}
+          element={(authUser === undefined) ? <Account /> : <Navigate to="/game"/>}
         />
         <Route path="game"
-          element={<Component/>} 
+          element={(authUser === undefined) ? <Navigate to="/"/> : <GameMenu/>} 
         />
       </Routes>
-      </div>
       <Toaster className="cursor-grab" />
       </div>
     </BrowserRouter>

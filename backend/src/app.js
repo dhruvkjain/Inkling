@@ -8,7 +8,7 @@ const fs = require('fs');
 app.use(cors());
 app.use(express.json());
 // TODO : change logs file name before production.
-var accessLogStream = fs.createWriteStream('../devlogs.txt', { flags: 'a' })
+var accessLogStream = fs.createWriteStream('./devlogs.txt', { flags: 'a' })
 app.use(morgan('combined' , { stream: accessLogStream }));
 
 const { authRouter } = require('./routes/auth.routes.js');
