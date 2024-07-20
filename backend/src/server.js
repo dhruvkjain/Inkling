@@ -4,8 +4,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const { app } = require(path.join(__dirname , 'app.js'));
-const { socketConnection } = require(path.join(__dirname, 'config'));
-const { connectToMongo } = require(path.join(__dirname, 'config'));
+const { socketConnection } = require('./config');
+const { connectToMongo } = require('./config');
 
 const server = http.createServer(app);
 const port = process.env.PORT || 3000;

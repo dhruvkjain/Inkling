@@ -1,8 +1,8 @@
-const path = require('path');
-const mongoServices = require(path.join(__dirname, 'mongo.js'));
-const socketServices = require(path.join(__dirname, 'socket.js'));
+const { connectToMongo , disconnectToMongo } = require('./mongo.js');
+const { socketConnection } = require('./socket.js');
 
 module.exports = {
-    ...mongoServices,
-    ...socketServices
+    connectToMongo,
+    disconnectToMongo,
+    socketConnection,
 }

@@ -1,7 +1,5 @@
-const path = require('path');
-
-const users = require(path.join(__dirname, '..', '..', 'models', 'user.model.js'));
-const { hashPassword, comparePassword, generateTokenAndSetCookie } = require(path.join(__dirname, '..', '..', 'utils'));
+const users = require('../../models/user.model.js');
+const { hashPassword, comparePassword, generateTokenAndSetCookie } = require('../../utils');
 
 async function signup(req, res) {
     try {

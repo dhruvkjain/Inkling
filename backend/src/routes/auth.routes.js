@@ -1,6 +1,5 @@
 const express = require('express');
-const path = require('path');
-const { signup, login, logout } = require(path.join(__dirname , 'controllers', 'auth.controllers.js'));
+const { signup, login, logout } = require('./controllers/auth.controllers.js');
 
 const authRouter = express.Router();
 
