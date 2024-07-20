@@ -1,8 +1,16 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
+export type authUser = {
+  ok:boolean
+  profilePic:string
+  username:string
+  fullName:string
+  _id:string
+}
+
 export type AuthContextType = {
-    authUser: string | undefined;
-    setAuthUser: (newValue: string | undefined) => void;
+    authUser: authUser | undefined;
+    setAuthUser: (newValue: authUser | undefined) => void;
 }
 type ContextProps = {
     children: ReactNode;
@@ -14,7 +22,7 @@ function AuthContextProvider({ children }: ContextProps) {
     const userData = localStorage.getItem("userData");
     // console.log(userData);
 
-    let parsedUserData: string | undefined = undefined;
+    let parsedUserData: authUser | undefined = undefined;
     if (userData) {
       try {
         parsedUserData = JSON.parse(userData);
@@ -24,7 +32,7 @@ function AuthContextProvider({ children }: ContextProps) {
     }
     // console.log(parsedUserData);
 
-    const [authUser, setAuthUser] = useState<string | undefined>(parsedUserData);
+    const [authUser, setAuthUser] = useState<authUser | undefined>(parsedUserData);
 
     return <AuthContext.Provider value={{ authUser, setAuthUser }}>
         {children}

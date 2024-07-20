@@ -19,7 +19,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 import { useAuth } from "../hooks/useAuth"
 
-function Login() {
+function Account() {
 
   const { submitSignup, submitLogin } = useAuth();
 
@@ -104,4 +104,4 @@ function Login() {
   )
 }
 
-export default Login;
+export default Account;

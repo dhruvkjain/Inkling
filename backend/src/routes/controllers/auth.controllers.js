@@ -36,6 +36,7 @@ async function signup(req, res) {
             res.status(201).json({
                 _id: newUser._id,
                 username: newUser.username,
+                fullName: newUser.fullName,
                 profilePic: newUser.profilePic
             });
         }
@@ -64,6 +65,7 @@ async function login(req, res) {
                 return res.status(200).json({
                     _id: isUserExist._id,
                     username: isUserExist.username,
+                    fullName: isUserExist.fullName,
                     profilePic: isUserExist.profilePic
                 })
             }

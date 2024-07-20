@@ -1,7 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Component from './pages/Component.tsx';
-import Login from "./pages/Login.tsx";
+import Account from "./pages/Account.tsx";
 import Header from "./components/Header.tsx";
 import { Toaster } from "@/components/ui/sonner"
 
@@ -12,7 +12,6 @@ import { useAuthContext, AuthContextType } from "./context/AuthContext.tsx";
 function App() {
 
   const { authUser } = useAuthContext() as AuthContextType;
-  console.log(authUser);
 
   return (
     <BrowserRouter>
@@ -21,9 +20,9 @@ function App() {
       <div className="flex-grow flex justify-center items-center">
       <Routes>
         <Route index 
-          element={authUser ? <Navigate to="game" /> : <Login />}
+          element={(authUser === undefined) ? <Account /> : <Component/>}
         />
-        <Route path="game" 
+        <Route path="game"
           element={<Component/>} 
         />
       </Routes>

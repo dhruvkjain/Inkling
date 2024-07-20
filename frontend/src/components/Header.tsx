@@ -5,10 +5,13 @@ import {
     Menubar,
     MenubarMenu,
 } from "@/components/ui/menubar";
-import Account from "./Account";
+import Account from "./Profile";
 
+import { useAuthContext, AuthContextType } from "../context/AuthContext.tsx";
 
 function Header() {
+
+    const { authUser } = useAuthContext() as AuthContextType;
 
     useEffect(() => {
         const elements = document.getElementsByClassName('navlinks');
@@ -28,16 +31,21 @@ function Header() {
         <div className="grid grid-cols-4">
             <div className="h-fit w-fit p-2 col-span-3">
                 <Menubar>
-                    <MenubarMenu>
-                        <Link to="game">
-                            <button className="navlinks navlinks-inactive h-7 w-20 px- py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">Game</button>
-                        </Link>
-                        <Link to="/">
-                            <button className="navlinks navlinks-active h-7 w-20 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">Account</button>
-                        </Link>
-                        <button className="navlinks navlinks-inactive h-7 w-20 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">Ghost</button>
-                        <button className="navlinks navlinks-inactive h-7 w-20 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">Ghost</button>
-                    </MenubarMenu>
+                    {
+                        (authUser === undefined)
+                        ?   <MenubarMenu>
+                                <button className="navlinks navlinks-inactive pointer-events-none h-7 w-20 px- py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">Game</button>
+                                <Link to="/">
+                                    <button className="navlinks navlinks-active h-7 w-20 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">Account</button>
+                                </Link>
+                            </MenubarMenu>
+                        :   <MenubarMenu>
+                                 <Link to="game">
+                                    <button className="navlinks navlinks-active h-7 w-20 px- py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">Game</button>
+                                </Link>
+                                <button className="navlinks navlinks-inactive pointer-events-none h-7 w-20 px-3 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">Account</button>
+                            </MenubarMenu>
+                    }
                 </Menubar>
             </div>
             <div className="flex justify-end items-center p-2">

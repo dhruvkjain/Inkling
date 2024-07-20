@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 
-import { httpSignup, httpLogin } from "./request";
+import { httpSignup, httpLogin, httpLogout } from "./request";
 import { date } from "../utils/date.ts";
 
 import { toast } from "sonner"
@@ -117,12 +117,37 @@ function useAuth(){
       }
     }, [setAuthUser]);
 
+    const submitLogout = useCallback(async () => {
+      
+      const response = await httpLogout();
 
+      const success = response.ok;
+      if (success) {
+        if(response.error){
+          const {dateString} = date();
+          toast(`Failed Login : ${response.error}`,{
+           description: dateString
+          });
+        }
+        else{
+          localStorage.removeItem("userData");
+          setAuthUser(undefined);
+          setLoggedIn(false);
+          toast("Logout successfull !!");
+        }
+      } else {
+        const {dateString} = date();
+        toast(`Failed Logout : ${response.error}`,{
+          description: dateString
+        });
+      }
+    }, [setAuthUser]);
 
     return {
         isLoggedIn,
         submitSignup,
-        submitLogin
+        submitLogin,
+        submitLogout
     }
 }
 
