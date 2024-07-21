@@ -16,11 +16,18 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 
-import { useSocket } from "../hooks/useSocket.tsx";
+import { useSocket, roomCode } from "../hooks/useSocket.tsx";
 
 function GameMenu() {
 
-  const { createRoom } = useSocket()
+  const { createSocketConnection, createRoom } = useSocket();
+  async function initiateSocketConnection (){
+    createSocketConnection();
+    const roomcode:roomCode = await createRoom();
+    if(!roomcode.error){
+      console.log(roomcode.code);
+    }
+  }
 
   return (
     <div className="flex-grow flex justify-center items-center flex-col h-full w-full">
@@ -62,7 +69,7 @@ function GameMenu() {
           </CardHeader>
           <CardFooter>
             <div className="">
-              <Button onClick={createRoom}>Create room</Button>
+              <Button onClick={initiateSocketConnection}>Create room</Button>
             </div>
           </CardFooter>
         </Card>

@@ -15,39 +15,58 @@ type response = {
     error?: undefined;
 }
 
+export type roomCode = {
+    error?: string;
+    code?: string;
+};
+
 function useSocket() {
-    const socket: Socket = io('http://localhost:3000');
+    let socket: Socket;
 
     const { authUser } = useAuthContext() as AuthContextType;
 
-    const createRoom = () => {
-        if (authUser === undefined) {
-            const { dateString } = date();
-            toast(`Failed to Create Room : Login first`, {
-                description: dateString
-            });
-        }
-        else {
+    const createSocketConnection = () => {
+        socket = io('http://localhost:3000');
+    }
+
+    const createRoom = (): Promise<roomCode> => {
+        return new Promise((resolve) => {
+            if (!socket) {
+                resolve({ error: "No socket conncetion" });
+                return;
+            }
+    
+            if (authUser === undefined) {
+                const { dateString } = date();
+                toast(`Failed to Create Room : Login first`, {
+                    description: dateString
+                });
+                resolve({ error: "No Auth User" });
+                return;
+            }
+
             socket.emit('create-room', authUser.username, authUser.profilePic, (res: response) => {
                 if (res.error) {
                     const { dateString } = date();
                     toast(`Failed to Create Room : ${res.error}`, {
                         description: dateString
                     });
+                    resolve({ error: res.error });
                 }
                 else {
                     const { dateString } = date();
-                    console.log(res);
                     toast(`Room Code : ${res.secretcode}`, {
                         description: dateString
                     });
+                    resolve({ code: res.secretcode });
                 }
             })
-        }
+        })
     };
 
     return {
-        createRoom
+        createRoom,
+        createSocketConnection
     }
 }
 

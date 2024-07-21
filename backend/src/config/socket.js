@@ -17,7 +17,7 @@ function socketConnection(server) {
     })
 
     io.on('connection', (socket) => {
-        console.log(socket.id);
+        // console.log(socket.id);
 
         socket.on('checkSocketId', (socketId, callback) => {
             const exists = io.sockets.sockets.has(socketId);
