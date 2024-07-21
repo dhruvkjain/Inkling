@@ -22,8 +22,9 @@ export type roomCode = {
 
 function useSocket() {
     let socket: Socket;
+    let joinRoomCode: string | undefined;
 
-    const { authUser } = useAuthContext() as AuthContextType;
+    const { authUser, setRoomCode } = useAuthContext() as AuthContextType;
 
     const createSocketConnection = () => {
         socket = io('http://localhost:3000');
@@ -58,15 +59,25 @@ function useSocket() {
                     toast(`Room Code : ${res.secretcode}`, {
                         description: dateString
                     });
+                    setRoomCode(res.secretcode);
+                    joinRoomCode = res.secretcode;
                     resolve({ code: res.secretcode });
                 }
             })
         })
     };
 
+    const returnCode = () =>{
+        if (!socket) {
+            return undefined;
+        }
+        return joinRoomCode;
+    }
+
     return {
         createRoom,
-        createSocketConnection
+        createSocketConnection,
+        returnCode
     }
 }
 

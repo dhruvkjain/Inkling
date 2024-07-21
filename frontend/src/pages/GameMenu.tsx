@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -21,12 +23,16 @@ import { useSocket, roomCode } from "../hooks/useSocket.tsx";
 function GameMenu() {
 
   const { createSocketConnection, createRoom } = useSocket();
+  const navigate = useNavigate();
+
   async function initiateSocketConnection (){
     createSocketConnection();
     const roomcode:roomCode = await createRoom();
     if(!roomcode.error){
-      console.log(roomcode.code);
+      navigate('/game');
     }
+    // const joinRoomCode: string | undefined = returnCode();
+    // console.log(joinRoomCode);
   }
 
   return (
@@ -68,7 +74,7 @@ function GameMenu() {
             </CardDescription>
           </CardHeader>
           <CardFooter>
-            <div className="">
+            <div className="grid grid-cols-2">
               <Button onClick={initiateSocketConnection}>Create room</Button>
             </div>
           </CardFooter>

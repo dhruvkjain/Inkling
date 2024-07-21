@@ -11,6 +11,8 @@ export type authUser = {
 export type AuthContextType = {
     authUser: authUser | undefined;
     setAuthUser: (newValue: authUser | undefined) => void;
+    joinRoomCode: string | undefined;
+    setRoomCode: (newValue: string | undefined) => void;
 }
 type ContextProps = {
     children: ReactNode;
@@ -33,8 +35,9 @@ function AuthContextProvider({ children }: ContextProps) {
     // console.log(parsedUserData);
 
     const [authUser, setAuthUser] = useState<authUser | undefined>(parsedUserData);
+    const [joinRoomCode, setRoomCode] = useState<string | undefined>(undefined);
 
-    return <AuthContext.Provider value={{ authUser, setAuthUser }}>
+    return <AuthContext.Provider value={{ authUser, setAuthUser, joinRoomCode, setRoomCode}}>
         {children}
     </AuthContext.Provider>
 }
