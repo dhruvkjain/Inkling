@@ -9,7 +9,7 @@ function generateTokenAndSetCookie(userid, res) {
     maxAge: 60 * 60 * 1000, // == 1 hour always in MS
     httpOnly: true, // prevent XSS attacks cross-site scripting attacks
     sameSite: "strict", // CSRF attacks cross-site request forgery attacks
-    secure: process.env.NODE_ENV !== "development"
+    secure: process.env.NODE_ENV === "production"
   });
 }
   

@@ -10,6 +10,7 @@ import "./App.css";
 
 import { useAuthContext, AuthContextType } from "./context/AuthContext.tsx";
 
+
 function App() {
 
   const { authUser, joinRoomCode } = useAuthContext() as AuthContextType;

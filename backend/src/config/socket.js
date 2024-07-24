@@ -7,13 +7,19 @@ function socketConnection(server) {
 
     const io = new Server(server, {
         cors: {
-            origin: ['http://localhost:5173', 'https://admin.socket.io/', 'https://admin.socket.io/#/']
+            origin: ['http://localhost:5173', 'https://admin.socket.io/', 'https://admin.socket.io/#/'],
+            credentials: true, // enable credentials
         }
     });
 
     instrument(io, {
         auth: false,
         mode: "development",
+    })
+
+    io.use((socket, next)=>{
+        console.log(socket.request.headers.cookie);
+        next();
     })
 
     io.on('connection', (socket) => {

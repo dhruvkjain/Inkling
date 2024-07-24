@@ -27,7 +27,9 @@ function useSocket() {
     const { authUser, setRoomCode } = useAuthContext() as AuthContextType;
 
     const createSocketConnection = () => {
-        socket = io('http://localhost:3000');
+        socket = io('http://localhost:3000', {
+            withCredentials: true // to pass cookies to socket
+        });
     }
 
     const createRoom = (): Promise<roomCode> => {
@@ -36,7 +38,7 @@ function useSocket() {
                 resolve({ error: "No socket conncetion" });
                 return;
             }
-    
+
             if (authUser === undefined) {
                 const { dateString } = date();
                 toast(`Failed to Create Room : Login first`, {
@@ -67,7 +69,7 @@ function useSocket() {
         })
     };
 
-    const returnCode = () =>{
+    const returnCode = () => {
         if (!socket) {
             return undefined;
         }

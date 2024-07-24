@@ -20,6 +20,7 @@ async function httpSignup(signupdetails: signupdetails) {
     try { 
         const request = await fetch(`${APT_URL}/signup`, {
             method: 'post',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -38,12 +39,15 @@ async function httpLogin(logindetails: logindetails) {
     try { 
         const request = await fetch(`${APT_URL}/login`, {
             method: 'post',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(logindetails),
         });
         const response = await request.json();
+        console.log(request.headers.getSetCookie());
+        console.log(request.headers);
         response.ok = true;
         return response;
     }
@@ -54,7 +58,9 @@ async function httpLogin(logindetails: logindetails) {
 
 async function httpLogout() {
     try { 
-        const request = await fetch(`${APT_URL}/logout`);
+        const request = await fetch(`${APT_URL}/logout`, {
+            credentials: "include",
+        });
         const response = await request.json();
         response.ok = true;
         return response;
