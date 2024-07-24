@@ -46,8 +46,6 @@ async function httpLogin(logindetails: logindetails) {
             body: JSON.stringify(logindetails),
         });
         const response = await request.json();
-        console.log(request.headers.getSetCookie());
-        console.log(request.headers);
         response.ok = true;
         return response;
     }

@@ -30,6 +30,13 @@ function useSocket() {
         socket = io('http://localhost:3000', {
             withCredentials: true // to pass cookies to socket
         });
+
+        socket.on("connect_error", err => {
+            const { dateString } = date();
+            toast(`Failed to Create Room : ${err.message}`, {
+                description: dateString
+            });
+        });
     }
 
     const createRoom = (): Promise<roomCode> => {

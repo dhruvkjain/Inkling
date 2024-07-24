@@ -1,6 +1,7 @@
 const { instrument } = require('@socket.io/admin-ui');
 const { Server } = require('socket.io');
 
+const { verifyToken } = require('../utils')
 const { createRoom } = require('../services/game.services.js');
 
 function socketConnection(server) {
@@ -18,8 +19,21 @@ function socketConnection(server) {
     })
 
     io.use((socket, next)=>{
-        console.log(socket.request.headers.cookie);
-        next();
+        // console.log(socket.request.headers.cookie);
+        const cookies = socket.request.headers.cookie;
+        let token ;
+        cookies.split(';').forEach((ck)=>{
+            token = ( ck.trim().includes('jwt') ) 
+            ? ck.trim().substring(4)
+            : ''
+        });
+
+        if(token != ''){
+            verifyToken(token, next);
+        }
+        else{
+            next(new Error("Unauthorized - No Token Provided, Re-login"));
+        }
     })
 
     io.on('connection', (socket) => {
