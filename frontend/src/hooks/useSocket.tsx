@@ -32,6 +32,13 @@ function useSocket() {
         });
 
         socket.on("connect_error", err => {
+            if(err.message === 'xhr poll error'){
+                const { dateString } = date();
+                toast(`Failed to Create Room : Server Connection Error`, {
+                    description: dateString
+                });
+                socket.disconnect();
+            }
             const { dateString } = date();
             toast(`Failed to Create Room : ${err.message}`, {
                 description: dateString
