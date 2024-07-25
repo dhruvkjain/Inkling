@@ -34,4 +34,36 @@ async function createRoom(username, profilePic) {
     }
 }
 
-module.exports = { createRoom }
+async function joinRoom(username, profilePic, roomId) {
+    try {
+        if (!username || !profilePic || !roomId) {
+            return { error: 'Insufficient data' };
+        }
+        const user = await users.findOne({ username: username })
+        if (!user) {
+            return { error: "No such user exist" };
+        }
+        const game = await games.findOne({ secretcode: roomId })
+        if (!game) {
+            return { error: "No such game exist" };
+        }
+        const isGame = await games.findOneAndUpdate(
+            {secretcode: roomId},
+            {$push: {players:{username, profilePic}}},
+            {upsert: false,}
+        );
+
+        if (isGame) {
+            const game = await games.findOne({ secretcode: roomId })
+            return game;
+        }
+        else{
+            return { error: "Invalid user and game data" };
+        }
+    } catch (err) {
+        console.log("Error in join game service",err.message);
+        return { error: "Internal Server error" };
+    }
+}
+
+module.exports = { createRoom, joinRoom }

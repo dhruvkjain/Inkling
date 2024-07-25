@@ -3,15 +3,28 @@
  * @see https://v0.dev/t/n7Db7XIz79G
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
+
+import { useNavigate } from 'react-router-dom';
+
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { ClockIcon, TrophyIcon, UsersIcon } from "../components/Icons.tsx";
 
+import { useAuthContext, AuthContextType } from "../context/AuthContext.tsx";
+
 function Game() {
+
+  const { joinRoomCode } = useAuthContext() as AuthContextType;
+  console.log(joinRoomCode);
+  const navigate = useNavigate();
+  if(joinRoomCode === undefined){
+    navigate('/game');
+  }
+
   return (
     <div className="flex-grow flex flex-col h-full w-full">
-      <header className="bg-primary text-primary-foreground p-4 shadow">
+      {/* <header className="bg-primary text-primary-foreground p-4 shadow">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">Drawful</h1>
           <div className="flex items-center gap-4">
@@ -22,7 +35,7 @@ function Game() {
             <Button variant="outline">Leave Game</Button>
           </div>
         </div>
-      </header>
+      </header> */}
       <main className="flex-1 bg-background text-foreground p-8">
         <div className="container mx-auto grid grid-cols-2 gap-8">
           <div className="bg-card rounded-lg shadow p-6">
@@ -88,8 +101,12 @@ function Game() {
               <TrophyIcon className="w-5 h-5" />
               <span>Score: 120</span>
             </div>
+            <div className="flex items-center gap-2">
+              <UsersIcon className="w-5 h-5" />
+              <span>4/8</span>
+            </div>
           </div>
-          <Button>Submit Guess</Button>
+          <Button variant="outline" >Leave Game</Button>
         </div>
       </footer>
     </div>

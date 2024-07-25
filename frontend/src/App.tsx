@@ -18,7 +18,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-[100lvh] flex flex-col">
+      <main className="min-h-[100lvh] flex flex-col">
       <Header />
       <Routes>
         <Route index 
@@ -38,7 +38,7 @@ function App() {
         />
       </Routes>
       <Toaster className="cursor-grab" />
-      </div>
+      </main>
     </BrowserRouter>
   )
 }

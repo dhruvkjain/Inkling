@@ -3,14 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button"
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Tabs,
   TabsContent,
@@ -22,10 +20,10 @@ import { useSocket, roomCode } from "../hooks/useSocket.tsx";
 
 function GameMenu() {
 
-  const { createSocketConnection, createRoom } = useSocket();
+  const { createSocketConnection, createRoom, joinRoom } = useSocket();
   const navigate = useNavigate();
 
-  async function initiateSocketConnection (){
+  async function initiateSocketConnectionCreateRoom (){
     createSocketConnection();
     const roomcode:roomCode = await createRoom();
     if(!roomcode.error){
@@ -33,6 +31,18 @@ function GameMenu() {
     }
     // const joinRoomCode: string | undefined = returnCode();
     // console.log(joinRoomCode);
+  }
+
+  async function initiateSocketConnectionJoinRoom (){
+    const roomIdInput = document.getElementById('codeinput') as HTMLInputElement;
+    const roomId = roomIdInput.value;
+    createSocketConnection();
+    const roomcode:roomCode = await joinRoom(roomId);
+    if(!roomcode.error){
+      navigate('/game');
+    }
+    // // const joinRoomCode: string | undefined = returnCode();
+    // // console.log(joinRoomCode);
   }
 
   return (
@@ -50,18 +60,11 @@ function GameMenu() {
               Enter Secret Code of Room.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="space-y-1">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" defaultValue="Pedro Duarte" />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" defaultValue="@peduarte" />
-            </div>
-          </CardContent>
           <CardFooter>
-            <Button>Save changes</Button>
+            <div className="flex w-full justify-between items-center">
+              <Input className='mr-4' id="codeinput" placeholder="Room Code" />
+              <Button onClick={initiateSocketConnectionJoinRoom}>Join Room</Button>
+            </div>
           </CardFooter>
         </Card>
       </TabsContent>
@@ -75,7 +78,7 @@ function GameMenu() {
           </CardHeader>
           <CardFooter>
             <div className="grid grid-cols-2">
-              <Button onClick={initiateSocketConnection}>Create room</Button>
+              <Button onClick={initiateSocketConnectionCreateRoom}>Create Room</Button>
             </div>
           </CardFooter>
         </Card>

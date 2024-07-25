@@ -2,7 +2,7 @@ const { instrument } = require('@socket.io/admin-ui');
 const { Server } = require('socket.io');
 
 const { verifyToken } = require('../utils')
-const { createRoom } = require('../services/game.services.js');
+const { createRoom, joinRoom } = require('../services/game.services.js');
 
 function socketConnection(server) {
 
@@ -62,8 +62,17 @@ function socketConnection(server) {
             }
         })
 
-        socket.on('join-room', (roomId) => {
-            socket.join(roomId);
+        socket.on('join-room', async(username, profilePic, roomId, callback) => {
+            const gameData = await joinRoom(username, profilePic, roomId);
+            if(gameData.error){
+                console.log(gameData.error);
+                callback(gameData);
+            }
+            else{
+                socket.join(roomId);
+                socket.to(roomId).emit("notification",`${username} joined !!`);
+                callback(gameData);
+            }
         })
 
         // socket.onAny((event, ...args) => {
