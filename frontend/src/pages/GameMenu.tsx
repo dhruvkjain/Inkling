@@ -29,8 +29,6 @@ function GameMenu() {
     if(!roomcode.error){
       navigate('/game');
     }
-    // const joinRoomCode: string | undefined = returnCode();
-    // console.log(joinRoomCode);
   }
 
   async function initiateSocketConnectionJoinRoom (){
@@ -41,8 +39,6 @@ function GameMenu() {
     if(!roomcode.error){
       navigate('/game');
     }
-    // // const joinRoomCode: string | undefined = returnCode();
-    // // console.log(joinRoomCode);
   }
 
   return (

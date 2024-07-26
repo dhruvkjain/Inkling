@@ -20,10 +20,7 @@ async function createRoom(username, profilePic) {
 
         if (newGame) {
             await newGame.save();
-            return {
-                creator: newGame.creator,
-                secretcode: newGame.secretcode,
-            };
+            return newGame;
         }
         else{
             return { error: "Invalid user data" };
@@ -48,17 +45,16 @@ async function joinRoom(username, profilePic, roomId) {
             return { error: "No such game exist" };
         }
         const isGame = await games.findOneAndUpdate(
-            {secretcode: roomId},
+            {secretcode: roomId, 'players.username': { $ne: username }},
             {$push: {players:{username, profilePic}}},
-            {upsert: false,}
+            {upsert: false,new: true,}
         );
 
         if (isGame) {
-            const game = await games.findOne({ secretcode: roomId })
-            return game;
+            return isGame;
         }
         else{
-            return { error: "Invalid user and game data" };
+            return { error: "Player already in game" };
         }
     } catch (err) {
         console.log("Error in join game service",err.message);

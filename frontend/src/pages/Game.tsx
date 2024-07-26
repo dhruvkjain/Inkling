@@ -4,6 +4,7 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from "@/components/ui/button"
@@ -11,16 +12,17 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { ClockIcon, TrophyIcon, UsersIcon } from "../components/Icons.tsx";
 
-import { useAuthContext, AuthContextType } from "../context/AuthContext.tsx";
+import { useGameContext, GameContextType } from "../context/GameContext.tsx";
 
 function Game() {
 
-  const { joinRoomCode } = useAuthContext() as AuthContextType;
-  console.log(joinRoomCode);
+  const { gameDetails } = useGameContext() as GameContextType;
   const navigate = useNavigate();
-  if(joinRoomCode === undefined){
-    navigate('/game');
-  }
+  useEffect(()=>{
+    if(gameDetails?.secretcode === undefined){
+      navigate('/game');
+    }
+  });
 
   return (
     <div className="flex-grow flex flex-col h-full w-full">

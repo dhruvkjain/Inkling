@@ -4,39 +4,20 @@ import { date } from "../utils/date.ts";
 import { io, Socket } from 'socket.io-client';
 
 import { useAuthContext, AuthContextType } from "../context/AuthContext";
-
-type createRoomResponse = {
-    error: string;
-    creator?: undefined;
-    secretcode?: undefined;
-} | {
-    creator: string;
-    secretcode: string;
-    error?: undefined;
-}
-
-type player = {
-    username: string;
-    profilePic: string;
-}
-
-type joinRoomResponse = {
-    creator?: string;
-    secretcode?: string;
-    players?: [player];
-    error?: string;
-}
+import { gameResponse, useGameContext, GameContextType } from "../context/GameContext.tsx";
 
 export type roomCode = {
     error?: string;
     code?: string;
 };
 
+
 function useSocket() {
     let socket: Socket;
     let joinRoomCode: string | undefined;
 
-    const { authUser, setRoomCode } = useAuthContext() as AuthContextType;
+    const { authUser } = useAuthContext() as AuthContextType;
+    const { setGameDetails } = useGameContext() as GameContextType;
 
     const createSocketConnection = () => {
         socket = io('http://localhost:3000', {
@@ -57,7 +38,7 @@ function useSocket() {
             });
         });
 
-        socket.on("join-room-message", message => {
+        socket.on("notification", message => {
             const { dateString } = date();
             toast(message, {
                 description: dateString
@@ -81,7 +62,7 @@ function useSocket() {
                 return;
             }
 
-            socket.emit('create-room', authUser.username, authUser.profilePic, (res: createRoomResponse) => {
+            socket.emit('create-room', authUser.username, authUser.profilePic, (res: gameResponse) => {
                 if (res.error) {
                     const { dateString } = date();
                     toast(`Failed to Create Room : ${res.error}`, {
@@ -94,7 +75,7 @@ function useSocket() {
                     toast(`Room Code : ${res.secretcode}`, {
                         description: dateString
                     });
-                    setRoomCode(res.secretcode);
+                    setGameDetails(res);
                     joinRoomCode = res.secretcode;
                     resolve({ code: res.secretcode });
                 }
@@ -118,7 +99,7 @@ function useSocket() {
                 return;
             }
 
-            socket.emit('join-room', authUser.username, authUser.profilePic, roomId, (res: joinRoomResponse) => {
+            socket.emit('join-room', authUser.username, authUser.profilePic, roomId, (res: gameResponse) => {
                 if (res.error) {
                     const { dateString } = date();
                     toast(`Failed to Create Room : ${res.error}`, {
@@ -132,7 +113,7 @@ function useSocket() {
                         description: dateString
                     });
                     console.log(res);
-                    setRoomCode(res.secretcode);
+                    setGameDetails(res);
                     joinRoomCode = res.secretcode;
                     resolve({ code: res.secretcode });
                 }

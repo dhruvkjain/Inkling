@@ -65,7 +65,7 @@ function socketConnection(server) {
         socket.on('join-room', async(username, profilePic, roomId, callback) => {
             const gameData = await joinRoom(username, profilePic, roomId);
             if(gameData.error){
-                console.log(gameData.error);
+                // console.log(gameData.error);
                 callback(gameData);
             }
             else{

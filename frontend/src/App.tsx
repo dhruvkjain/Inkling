@@ -9,12 +9,13 @@ import { Toaster } from "@/components/ui/sonner"
 import "./App.css";
 
 import { useAuthContext, AuthContextType } from "./context/AuthContext.tsx";
-
+import { useGameContext, GameContextType } from "./context/GameContext.tsx";
 
 function App() {
 
-  const { authUser, joinRoomCode } = useAuthContext() as AuthContextType;
-  console.log(joinRoomCode);
+  const { authUser } = useAuthContext() as AuthContextType;
+  const { gameDetails } = useGameContext() as GameContextType;
+  console.log(gameDetails);
 
   return (
     <BrowserRouter>
@@ -27,14 +28,14 @@ function App() {
         <Route path="gameMenu"
           element={authUser === undefined ? (
             <Navigate to="/" />
-          ) : joinRoomCode !== undefined ? (
+          ) : gameDetails?.secretcode !== undefined ? (
             <Navigate to="/game" />
           ) : (
             <GameMenu />
           )}
         />
         <Route path="game"
-          element={(authUser === undefined || joinRoomCode === undefined) ? <Navigate to="/"/> : <Game/>} 
+          element={(authUser === undefined || gameDetails?.secretcode === undefined) ? <Navigate to="/"/> : <Game/>} 
         />
       </Routes>
       <Toaster className="cursor-grab" />
