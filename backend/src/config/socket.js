@@ -71,6 +71,7 @@ function socketConnection(server) {
             else{
                 socket.join(roomId);
                 socket.to(roomId).emit("notification",`${username} joined !!`);
+                socket.to(roomId).emit("update-gameDetails", gameData);
                 callback(gameData);
             }
         })

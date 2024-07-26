@@ -24,6 +24,17 @@ function useSocket() {
             withCredentials: true // to pass cookies to socket
         });
 
+        socket.on("update-gameDetails", gameData => {
+            setGameDetails(gameData);
+        })
+
+        socket.on("notification", message => {
+            const { dateString } = date();
+            toast(message, {
+                description: dateString
+            });
+        });
+
         socket.on("connect_error", err => {
             if(err.message === 'xhr poll error'){
                 const { dateString } = date();
@@ -34,13 +45,6 @@ function useSocket() {
             }
             const { dateString } = date();
             toast(`Failed : ${err.message}`, {
-                description: dateString
-            });
-        });
-
-        socket.on("notification", message => {
-            const { dateString } = date();
-            toast(message, {
                 description: dateString
             });
         });
@@ -112,7 +116,6 @@ function useSocket() {
                     toast(`Room Code : ${res.secretcode}`, {
                         description: dateString
                     });
-                    console.log(res);
                     setGameDetails(res);
                     joinRoomCode = res.secretcode;
                     resolve({ code: res.secretcode });

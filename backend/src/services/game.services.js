@@ -15,18 +15,22 @@ async function createRoom(username, profilePic) {
         const newGame = new games({
             creator: username,
             secretcode: uuidv4(),
-            players: [{username, profilePic}]
+            players: [{ username, profilePic }]
         })
 
         if (newGame) {
             await newGame.save();
-            return newGame;
+            return {
+                creator: newGame.creator,
+                secretcode: newGame.secretcode,
+                players: newGame.players,
+            };
         }
-        else{
+        else {
             return { error: "Invalid user data" };
         }
     } catch (err) {
-        console.log("Error in create game service",err.message);
+        console.log("Error in create game service", err.message);
         return { error: "Internal Server error" };
     }
 }
@@ -45,19 +49,23 @@ async function joinRoom(username, profilePic, roomId) {
             return { error: "No such game exist" };
         }
         const isGame = await games.findOneAndUpdate(
-            {secretcode: roomId, 'players.username': { $ne: username }},
-            {$push: {players:{username, profilePic}}},
-            {upsert: false,new: true,}
+            { secretcode: roomId, 'players.username': { $ne: username } },
+            { $push: { players: { username, profilePic } } },
+            { upsert: false, new: true, }
         );
 
         if (isGame) {
-            return isGame;
+            return {
+                creator: isGame.creator,
+                secretcode: isGame.secretcode,
+                players: isGame.players,
+            };
         }
-        else{
+        else {
             return { error: "Player already in game" };
         }
     } catch (err) {
-        console.log("Error in join game service",err.message);
+        console.log("Error in join game service", err.message);
         return { error: "Internal Server error" };
     }
 }

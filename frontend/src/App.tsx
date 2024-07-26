@@ -19,7 +19,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <main className="min-h-[100lvh] flex flex-col">
+      <main className="h-[100lvh] flex flex-col overflow-hidden">
       <Header />
       <Routes>
         <Route index 
