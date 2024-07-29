@@ -7,6 +7,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -33,28 +34,36 @@ function Game() {
             <div className="w-full h-full">
             </div>
           </div>
-          <div className="bg-card rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold mb-4">Guesses</h2>
-            <div className="space-y-4">
-              {
-                gameDetails?.players?.map((player) => {
-                  return (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <Avatar>
-                          <AvatarImage src={player.profilePic} />
-                          <AvatarFallback>DJ</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{player.username}</p>
-                          <p className="text-muted-foreground text-sm">Guessed: "Flower"</p>
+          <div className="bg-card flex flex-col justify-between rounded-lg shadow p-6">
+            <div>
+              <h2 className="text-xl font-bold mb-4">Guesses</h2>
+              <div className="space-y-4 overflow-y-auto">
+                {
+                  gameDetails?.players?.map((player) => {
+                    return (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <Avatar>
+                            <AvatarImage src={player.profilePic} />
+                            <AvatarFallback>DJ</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">{player.username}</p>
+                            <p className="text-muted-foreground text-sm">Guessed: "Flower"</p>
+                          </div>
                         </div>
+                        <Badge variant="outline">Correct</Badge>
                       </div>
-                      <Badge variant="outline">Correct</Badge>
-                    </div>
-                  )
-                })
-              }
+                    )
+                  })
+                }
+              </div>
+            </div>
+            <div className='pt-2 rounded-lg'>
+              <div className="flex w-full justify-between items-center">
+                <Input className='mr-4' id="guess" placeholder="your guess ...." />
+                <Button>Send</Button>
+              </div>
             </div>
           </div>
         </div>
@@ -78,7 +87,7 @@ function Game() {
           <div>
             <p className='text-xl'><span className='font-bold'>Room Code: </span>{gameDetails?.secretcode}</p>
           </div>
-          <Button className='font-medium' variant="outline" >Leave Game</Button>
+          <Button className='font-medium text-xl' variant="link" >Leave Game</Button>
         </div>
       </footer>
     </div>

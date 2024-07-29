@@ -7,7 +7,12 @@ const playerSchema = new mongoose.Schema({
     },
     profilePic: { 
         type: String,
-        default:""
+        default: ""
+    },
+    score: {
+        type: Number,
+        required: true,
+        default: 0
     }
 });
 
@@ -20,6 +25,10 @@ const gameSchema = new mongoose.Schema({
     secretcode: {
         type: String, 
         required: true,
+    },
+    currentword: {
+        type: String,
+        default: ""
     },
     players: { 
         type: [playerSchema], 
