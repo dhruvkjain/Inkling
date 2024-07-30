@@ -2,7 +2,8 @@ const { instrument } = require('@socket.io/admin-ui');
 const { Server } = require('socket.io');
 
 const { verifyToken } = require('../utils')
-const { createRoom, joinRoom } = require('../services/game.services.js');
+const { createRoom, joinRoom, disconnected, generateWord } = require('../services/game.services.js');
+
 
 function socketConnection(server) {
 
@@ -50,7 +51,7 @@ function socketConnection(server) {
         })
 
         socket.on('create-room', async(username, profilePic, callback) => {
-            const gameData = await createRoom(username, profilePic);
+            const gameData = await createRoom(socket.id, username, profilePic);
             
             if(gameData.error){
                 console.log(gameData.error);
@@ -63,7 +64,7 @@ function socketConnection(server) {
         })
 
         socket.on('join-room', async(username, profilePic, roomId, callback) => {
-            const gameData = await joinRoom(username, profilePic, roomId);
+            const gameData = await joinRoom(socket.id, username, profilePic, roomId);
             if(gameData.error){
                 // console.log(gameData.error);
                 callback(gameData);
@@ -76,13 +77,27 @@ function socketConnection(server) {
             }
         })
 
+        socket.on('generate-word', async(secretcode) => {
+            const gameData = await generateWord(secretcode);
+            if(gameData.error){
+                socket.to(secretcode).emit("notification",`Error, Restart game: ${gameData.error}`);
+            }
+            else{
+                io.to(gameData.to).emit("select-word", gameData.words);
+            }
+        })
+ 
         // socket.onAny((event, ...args) => {
         //     console.log(event, args);
         // });
 
         socket.conn.on("close", (reason) => {
-            console.log(`disconnected bcz ${reason}`);
+            console.log(`disconnected bcz ${reason}, ${socket.id}`);
         });
+
+        socket.on("leave-game" , (secretcode)=>{
+            disconnected(socket.id,secretcode);
+        })
 
         socket.on("connect_error", (err) => {
             if (err && err.message === "unauthorized event") {

@@ -1,10 +1,16 @@
+const { v4: uuidv4 } = require('uuid');
+let generaterandomwords;
+(async () => {
+    const { generate } = await import('random-words');
+    generaterandomwords = generate;
+})();
+
 const games = require('../models/game.model.js');
 const users = require('../models/user.model.js');
-const { v4: uuidv4 } = require('uuid');
 
-async function createRoom(username, profilePic) {
+async function createRoom(socketId, username, profilePic) {
     try {
-        if (!username || !profilePic) {
+        if (!username || !profilePic || !socketId) {
             return { error: 'Insufficient data' };
         }
         const user = await users.findOne({ username: username })
@@ -15,7 +21,7 @@ async function createRoom(username, profilePic) {
         const newGame = new games({
             creator: username,
             secretcode: uuidv4(),
-            players: [{ username, profilePic }]
+            players: [{socketId, username, profilePic }]
         })
 
         if (newGame) {
@@ -35,9 +41,9 @@ async function createRoom(username, profilePic) {
     }
 }
 
-async function joinRoom(username, profilePic, roomId) {
+async function joinRoom(socketId, username, profilePic, roomId) {
     try {
-        if (!username || !profilePic || !roomId) {
+        if (!username || !profilePic || !roomId || !socketId) {
             return { error: 'Insufficient data' };
         }
         const user = await users.findOne({ username: username })
@@ -50,7 +56,7 @@ async function joinRoom(username, profilePic, roomId) {
         }
         const isGame = await games.findOneAndUpdate(
             { secretcode: roomId, 'players.username': { $ne: username } },
-            { $push: { players: { username, profilePic } } },
+            { $push: { players: { username, profilePic, socketId } } },
             { upsert: false, new: true, }
         );
 
@@ -70,4 +76,52 @@ async function joinRoom(username, profilePic, roomId) {
     }
 }
 
-module.exports = { createRoom, joinRoom }
+async function generateWord(secretcode) {
+    try {
+        if (!secretcode) {
+            return { error: 'Insufficient data' };
+        }
+        const gameExists = await games.findOne({ secretcode: secretcode });
+        if (!gameExists) {
+            return { error: "No such game exist" };
+        }
+        
+        const drawer = gameExists.players[(Math.floor(Math.random() * gameExists.players.length))];
+        return { to: drawer.socketId, words: generaterandomwords(5) };
+
+    } catch (err) {
+        console.log("Error in generateWord service", err.message);
+        return { error: "Internal Server error" };
+    }
+}
+
+async function disconnected(socketId, secretcode) {
+    try {
+        if (!socketId || !secretcode) {
+            return { error: 'Insufficient data' };
+        }
+        if (!socketId) {
+            return { error: 'No Socket Id provided' };
+        }
+        const isGame = await games.findOneAndUpdate(
+            { secretcode: secretcode },
+            { $pull: { players: { socketId: socketId } } },
+            { upsert: false, new: true, }
+        );
+
+        if (!isGame) {
+            return;
+        }
+
+        if(isGame.players.length == 0){
+            await games.deleteOne(
+                { secretcode: secretcode }
+            );
+        }
+    } catch (err) {
+        console.log("Error in disconnect service", err.message);
+        return { error: "Internal Server error" };
+    }
+}
+
+module.exports = { createRoom, joinRoom, disconnected, generateWord }

@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const playerSchema = new mongoose.Schema({
+    socketId: {
+        type: String,
+        required: true,
+    },
     username: { 
         type: String, 
         required: true,
@@ -11,7 +15,6 @@ const playerSchema = new mongoose.Schema({
     },
     score: {
         type: Number,
-        required: true,
         default: 0
     }
 });

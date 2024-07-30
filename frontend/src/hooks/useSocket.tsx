@@ -11,18 +11,26 @@ export type roomCode = {
     code?: string;
 };
 
+export type generateWord = {
+    error?: string;
+}
 
 function useSocket() {
     let socket: Socket;
     let joinRoomCode: string | undefined;
 
     const { authUser } = useAuthContext() as AuthContextType;
-    const { setGameDetails } = useGameContext() as GameContextType;
+    const { setGameDetails, setOpenDialog, setWords } = useGameContext() as GameContextType;
 
     const createSocketConnection = () => {
         socket = io('http://localhost:3000', {
             withCredentials: true // to pass cookies to socket
         });
+
+        socket.on("select-word", gameData => {
+            setWords(gameData);
+            setOpenDialog(true);
+        })
 
         socket.on("update-gameDetails", gameData => {
             setGameDetails(gameData);
@@ -33,6 +41,11 @@ function useSocket() {
             toast(message, {
                 description: dateString
             });
+        });
+        
+        window.addEventListener('beforeunload', () => {
+            if(socket)
+                socket.emit('leave-game', joinRoomCode);
         });
 
         socket.on("connect_error", err => {
@@ -124,6 +137,27 @@ function useSocket() {
         })
     };
 
+    const generateWord = (): Promise<generateWord> => {
+        return new Promise((resolve) => {
+            if (!socket) {
+                resolve({ error: "No socket conncetion" });
+                return;
+            }
+
+            if (authUser === undefined) {
+                const { dateString } = date();
+                toast(`Failed to Create Room : Login first`, {
+                    description: dateString
+                });
+                resolve({ error: "No Auth User" });
+                return;
+            }
+
+            socket.emit('generate-word', joinRoomCode);
+            resolve({})
+        })
+    };
+
     const returnCode = () => {
         if (!socket) {
             return undefined;
@@ -132,9 +166,10 @@ function useSocket() {
     }
 
     return {
+        createSocketConnection,
         createRoom,
         joinRoom,
-        createSocketConnection,
+        generateWord,
         returnCode
     }
 }

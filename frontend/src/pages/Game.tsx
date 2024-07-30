@@ -12,13 +12,24 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { ClockIcon, TrophyIcon, UsersIcon } from "../components/Icons.tsx";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 import { useGameContext, GameContextType } from "../context/GameContext.tsx";
 
 function Game() {
 
-  const { gameDetails } = useGameContext() as GameContextType;
+  const { gameDetails, openDialog, setOpenDialog, words } = useGameContext() as GameContextType;
   const navigate = useNavigate();
+
   useEffect(() => {
     if (gameDetails?.secretcode === undefined) {
       navigate('/game');
@@ -27,6 +38,29 @@ function Game() {
 
   return (
     <div className="flex-grow flex flex-col justify-between h-full w-full">
+      <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+        <Button onClick={()=>{setOpenDialog(!openDialog)}}>Show</Button>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Select a word to draw</AlertDialogTitle>
+            <AlertDialogDescription>
+              {
+                words?.map((word)=>{
+                  return(
+                    <>
+                      <span className='text-primary mr-4 cursor-pointer underline-offset-4 hover:underline'>{word}</span>
+                    </>
+                  )
+                })
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <main className="flex-grow bg-background text-foreground pt-4 pl-8 pr-8 pb-4">
         <div className="w-full h-full grid grid-cols-4 gap-8">
           <div className="bg-card rounded-lg shadow p-6 col-span-3">
