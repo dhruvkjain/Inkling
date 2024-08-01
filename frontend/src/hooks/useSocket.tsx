@@ -1,4 +1,4 @@
-// import { useCallback } from "react";
+// import { useRef } from "react";
 import { toast } from "sonner";
 import { date } from "../utils/date.ts";
 import { io, Socket } from 'socket.io-client';
@@ -11,18 +11,22 @@ export type roomCode = {
     code?: string;
 };
 
-export type generateWord = {
+export type errorMessage = {
     error?: string;
 }
 
+// declare persistant variable here as everytime useSocket hook is called
+// we want to persist data in a variable and not redeclare them.
+let socket: Socket;
+let joinRoomCode: string | undefined;
+
 function useSocket() {
-    let socket: Socket;
-    let joinRoomCode: string | undefined;
 
     const { authUser } = useAuthContext() as AuthContextType;
     const { setGameDetails, setOpenDialog, setWords } = useGameContext() as GameContextType;
 
     const createSocketConnection = () => {
+        if (socket) return;   // Prevent re-initialization
         socket = io('http://localhost:3000', {
             withCredentials: true // to pass cookies to socket
         });
@@ -54,7 +58,7 @@ function useSocket() {
                 toast(`Failed : Server Connection Error`, {
                     description: dateString
                 });
-                socket.disconnect();
+                socket?.disconnect();
             }
             const { dateString } = date();
             toast(`Failed : ${err.message}`, {
@@ -137,7 +141,7 @@ function useSocket() {
         })
     };
 
-    const generateWord = (): Promise<generateWord> => {
+    const generateWord = (): Promise<errorMessage> => {
         return new Promise((resolve) => {
             if (!socket) {
                 resolve({ error: "No socket conncetion" });
@@ -146,7 +150,7 @@ function useSocket() {
 
             if (authUser === undefined) {
                 const { dateString } = date();
-                toast(`Failed to Create Room : Login first`, {
+                toast(`Failed to Start game : Login first`, {
                     description: dateString
                 });
                 resolve({ error: "No Auth User" });
@@ -155,6 +159,45 @@ function useSocket() {
 
             socket.emit('generate-word', joinRoomCode);
             resolve({})
+        })
+    };
+
+    const selectedWord = (word:string): Promise<errorMessage> => {
+        return new Promise((resolve) => {
+            if (!socket) {
+                resolve({ error: "No socket conncetion" });
+                return;
+            }
+
+            if (authUser === undefined) {
+                const { dateString } = date();
+                toast(`Failed to Start game : Login first`, {
+                    description: dateString
+                });
+                resolve({ error: "No Auth User" });
+                return;
+            }
+
+            console.log(word);
+            socket.emit('selected-word', word, joinRoomCode, (res: errorMessage) => {
+                if (res.error) {
+                    const { dateString } = date();
+                    toast(`Failed to generate word : ${res.error}`, {
+                        description: dateString
+                    });
+                    setOpenDialog(false);
+                    return({ error: res.error });
+                }
+                else {
+                    const { dateString } = date();
+                    toast(`Start to draw word: ${word}`, {
+                        description: dateString
+                    });
+                    setOpenDialog(false);
+                    return({});
+                }
+            })
+            return({})
         })
     };
 
@@ -170,6 +213,7 @@ function useSocket() {
         createRoom,
         joinRoom,
         generateWord,
+        selectedWord,
         returnCode
     }
 }

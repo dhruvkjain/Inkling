@@ -7,6 +7,7 @@ let generaterandomwords;
 
 const games = require('../models/game.model.js');
 const users = require('../models/user.model.js');
+const { getData, storeData } = require('../config/redis.js');
 
 async function createRoom(socketId, username, profilePic) {
     try {
@@ -95,6 +96,31 @@ async function generateWord(secretcode) {
     }
 }
 
+async function setCurrentWord(word, secretcode) {
+    try {
+        if (!word || !secretcode) {
+            return { error: 'Insufficient data' };
+        }
+        const gameExists = await games.findOneAndUpdate(
+            { secretcode: secretcode },
+            { currentword: word },
+            { upsert: false, new: true, }
+        );
+        if (!gameExists) {
+            return { error: "No such game exist" };
+        }
+        const res = await storeData(secretcode, word);
+        if(res != 'OK'){
+            return { error: "Can't cache word" };
+        }
+        return ({});
+
+    } catch (err) {
+        console.log("Error in setCurrentWord service", err.message);
+        return { error: "Internal Server error" };
+    }
+}
+
 async function disconnected(socketId, secretcode) {
     try {
         if (!socketId || !secretcode) {
@@ -124,4 +150,10 @@ async function disconnected(socketId, secretcode) {
     }
 }
 
-module.exports = { createRoom, joinRoom, disconnected, generateWord }
+module.exports = { 
+    createRoom, 
+    joinRoom, 
+    disconnected, 
+    generateWord,
+    setCurrentWord 
+}

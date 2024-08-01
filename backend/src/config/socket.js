@@ -2,7 +2,7 @@ const { instrument } = require('@socket.io/admin-ui');
 const { Server } = require('socket.io');
 
 const { verifyToken } = require('../utils')
-const { createRoom, joinRoom, disconnected, generateWord } = require('../services/game.services.js');
+const { createRoom, joinRoom, disconnected, generateWord, setCurrentWord } = require('../services/game.services.js');
 
 
 function socketConnection(server) {
@@ -87,6 +87,14 @@ function socketConnection(server) {
             }
         })
  
+        socket.on('selected-word', async(word, secretcode, callback) => {
+            const res = await setCurrentWord(word, secretcode);
+            if(res.error){
+                callback(res);
+            }
+            callback({});
+        })
+
         // socket.onAny((event, ...args) => {
         //     console.log(event, args);
         // });

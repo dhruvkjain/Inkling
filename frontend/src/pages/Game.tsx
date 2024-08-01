@@ -24,11 +24,13 @@ import {
 } from "@/components/ui/alert-dialog"
 
 import { useGameContext, GameContextType } from "../context/GameContext.tsx";
+import { useSocket, errorMessage } from '../hooks/useSocket.tsx';
 
 function Game() {
 
   const { gameDetails, openDialog, setOpenDialog, words } = useGameContext() as GameContextType;
   const navigate = useNavigate();
+  const { selectedWord } = useSocket();
 
   useEffect(() => {
     if (gameDetails?.secretcode === undefined) {
@@ -36,10 +38,18 @@ function Game() {
     }
   });
 
+  async function sendSelectedWord(word:string){
+    console.log(word);
+    const res:errorMessage = await selectedWord(word);
+    if(res.error) {
+      return;
+    }
+  }
+
   return (
     <div className="flex-grow flex flex-col justify-between h-full w-full">
       <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
-        <Button onClick={()=>{setOpenDialog(!openDialog)}}>Show</Button>
+        {/* <Button onClick={()=>{setOpenDialog(!openDialog)}}>Show</Button> */}
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Select a word to draw</AlertDialogTitle>
@@ -48,7 +58,7 @@ function Game() {
                 words?.map((word)=>{
                   return(
                     <>
-                      <span className='text-primary mr-4 cursor-pointer underline-offset-4 hover:underline'>{word}</span>
+                      <Button onClick={()=>{sendSelectedWord(word)}} variant={'link'} className='text-primary mr-4 cursor-pointer underline-offset-4 hover:underline'>{word}</Button>
                     </>
                   )
                 })

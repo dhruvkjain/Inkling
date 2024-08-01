@@ -24,7 +24,7 @@ async function storeData(key, value) {
     if(!client){
         return
     }
-    return await client.SETEX(key, 86400, value);
+    return await client.setEx(key, 86400, value);
 }
 
 async function getData(key) {

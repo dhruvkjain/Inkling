@@ -23,7 +23,9 @@ function App() {
       <Header />
       <Routes>
         <Route index 
-          element={(authUser === undefined) ? <Account /> : <Navigate to="/gameMenu"/>}
+          element={(authUser === undefined) 
+            ? <Account /> 
+            : <Navigate to="/gameMenu"/>}
         />
         <Route path="gameMenu"
           element={authUser === undefined ? (
@@ -35,7 +37,9 @@ function App() {
           )}
         />
         <Route path="game"
-          element={(authUser === undefined || gameDetails?.secretcode === undefined) ? <Navigate to="/"/> : <Game/>} 
+          element={(authUser === undefined || gameDetails?.secretcode === undefined) 
+            ? <Navigate to="/"/> 
+            : <Game/>} 
         />
       </Routes>
       <Toaster className="cursor-grab" />
