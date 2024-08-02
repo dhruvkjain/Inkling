@@ -27,6 +27,9 @@ function GameMenu() {
     createSocketConnection();
     const roomcode:roomCode = await createRoom();
     if(!roomcode.error){
+      setTimeout(async()=>{
+        await generateWord();
+      }, 20000);
       navigate('/game');
     }
   }
@@ -37,9 +40,6 @@ function GameMenu() {
     createSocketConnection();
     const roomcode:roomCode = await joinRoom(roomId);
     if(!roomcode.error){
-      setTimeout(async()=>{
-        await generateWord();
-      }, 10000);
       navigate('/game');
     }
   }

@@ -34,7 +34,7 @@ async function getData(key) {
     return await client.get(key);
 }
 
-async function disconnectToRedis(key) {
+async function disconnectToRedis() {
     if(!client){
         return
     }

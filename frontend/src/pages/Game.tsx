@@ -14,23 +14,20 @@ import { Badge } from "@/components/ui/badge"
 import { ClockIcon, TrophyIcon, UsersIcon } from "../components/Icons.tsx";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
 import { useGameContext, GameContextType } from "../context/GameContext.tsx";
-import { useSocket, errorMessage } from '../hooks/useSocket.tsx';
+import { useSocket, errorMessage, guessResponse } from '../hooks/useSocket.tsx';
 
 function Game() {
 
   const { gameDetails, openDialog, setOpenDialog, words } = useGameContext() as GameContextType;
   const navigate = useNavigate();
-  const { selectedWord } = useSocket();
+  const { selectedWord, submitGuess } = useSocket();
 
   useEffect(() => {
     if (gameDetails?.secretcode === undefined) {
@@ -45,6 +42,16 @@ function Game() {
       return;
     }
   }
+
+  async function sendSubmitGuess(){
+    const wordInput = document.getElementById('guess') as HTMLInputElement;
+    const word = wordInput.value;
+    const res:guessResponse = await submitGuess(word);
+    if(res.error) {
+      return;
+    }
+  }
+
 
   return (
     <div className="flex-grow flex flex-col justify-between h-full w-full">
@@ -65,10 +72,6 @@ function Game() {
               }
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction>Continue</AlertDialogAction>
-          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
       <main className="flex-grow bg-background text-foreground pt-4 pl-8 pr-8 pb-4">
@@ -106,7 +109,7 @@ function Game() {
             <div className='pt-2 rounded-lg'>
               <div className="flex w-full justify-between items-center">
                 <Input className='mr-4' id="guess" placeholder="your guess ...." />
-                <Button>Send</Button>
+                <Button onClick={()=>{sendSubmitGuess()}}>Send</Button>
               </div>
             </div>
           </div>

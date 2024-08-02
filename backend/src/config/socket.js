@@ -2,7 +2,7 @@ const { instrument } = require('@socket.io/admin-ui');
 const { Server } = require('socket.io');
 
 const { verifyToken } = require('../utils')
-const { createRoom, joinRoom, disconnected, generateWord, setCurrentWord } = require('../services/game.services.js');
+const { createRoom, joinRoom, disconnected, generateWord, setCurrentWord, checkGuess } = require('../services/game.services.js');
 
 
 function socketConnection(server) {
@@ -93,6 +93,17 @@ function socketConnection(server) {
                 callback(res);
             }
             callback({});
+        })
+
+        socket.on('submit-guess', async(word, secretcode, username, callback) => {
+            const res = await checkGuess(word, secretcode, username);
+            if(res.error){
+                callback(res);
+            }
+            if(res.ok){
+                io.to(secretcode).emit("notification",`${username} guessed correctly, word was: ${word}`);
+            }
+            callback(res);
         })
 
         // socket.onAny((event, ...args) => {

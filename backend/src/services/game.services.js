@@ -22,7 +22,7 @@ async function createRoom(socketId, username, profilePic) {
         const newGame = new games({
             creator: username,
             secretcode: uuidv4(),
-            players: [{socketId, username, profilePic }]
+            players: [{ socketId, username, profilePic }]
         })
 
         if (newGame) {
@@ -86,7 +86,7 @@ async function generateWord(secretcode) {
         if (!gameExists) {
             return { error: "No such game exist" };
         }
-        
+
         const drawer = gameExists.players[(Math.floor(Math.random() * gameExists.players.length))];
         return { to: drawer.socketId, words: generaterandomwords(5) };
 
@@ -110,13 +110,36 @@ async function setCurrentWord(word, secretcode) {
             return { error: "No such game exist" };
         }
         const res = await storeData(secretcode, word);
-        if(res != 'OK'){
+        if (res != 'OK') {
             return { error: "Can't cache word" };
         }
         return ({});
 
     } catch (err) {
         console.log("Error in setCurrentWord service", err.message);
+        return { error: "Internal Server error" };
+    }
+}
+
+async function checkGuess(word, secretcode, username) {
+    try {
+        if (!word || !secretcode || !username) {
+            return { error: 'Insufficient data' };
+        }
+
+        const res = await getData(secretcode);
+        if (res == null) {
+            const gameExists = await games.findOne({ secretcode: secretcode });
+            if (!gameExists) {
+                return { error: "No such game exist" };
+            }
+            await storeData(secretcode, word);
+            return { ok: gameExists.currentword == word };
+        }
+        return ({ ok: res==word }); 
+
+    } catch (err) {
+        console.log("Error in checkGuess service", err.message);
         return { error: "Internal Server error" };
     }
 }
@@ -139,7 +162,7 @@ async function disconnected(socketId, secretcode) {
             return;
         }
 
-        if(isGame.players.length == 0){
+        if (isGame.players.length == 0) {
             await games.deleteOne(
                 { secretcode: secretcode }
             );
@@ -150,10 +173,11 @@ async function disconnected(socketId, secretcode) {
     }
 }
 
-module.exports = { 
-    createRoom, 
-    joinRoom, 
-    disconnected, 
+module.exports = {
+    createRoom,
+    joinRoom,
+    disconnected,
     generateWord,
-    setCurrentWord 
+    setCurrentWord,
+    checkGuess,
 }

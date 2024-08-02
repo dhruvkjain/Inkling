@@ -15,6 +15,11 @@ export type errorMessage = {
     error?: string;
 }
 
+export type guessResponse = {
+    ok?: boolean;
+    error?: string;
+}
+
 // declare persistant variable here as everytime useSocket hook is called
 // we want to persist data in a variable and not redeclare them.
 let socket: Socket;
@@ -178,7 +183,6 @@ function useSocket() {
                 return;
             }
 
-            console.log(word);
             socket.emit('selected-word', word, joinRoomCode, (res: errorMessage) => {
                 if (res.error) {
                     const { dateString } = date();
@@ -201,6 +205,45 @@ function useSocket() {
         })
     };
 
+    const submitGuess = (word:string): Promise<guessResponse> => {
+        return new Promise((resolve) => {
+            if (!socket) {
+                resolve({ error: "No socket conncetion" });
+                return;
+            }
+
+            if (authUser === undefined) {
+                const { dateString } = date();
+                toast(`Failed to submit guess : Login first`, {
+                    description: dateString
+                });
+                resolve({ error: "No Auth User" });
+                return;
+            }
+
+            console.log(word);
+            socket.emit('submit-guess', word, joinRoomCode, authUser.username, (res: guessResponse) => {
+                if (res.error) {
+                    const { dateString } = date();
+                    toast(`Error Rejoin please: ${res.error}`, {
+                        description: dateString
+                    });
+                    return({ error: res.error });
+                }
+                else {
+                    if(!res.ok){
+                        const { dateString } = date();
+                        toast(`Wrong guess: ${word}`, {
+                            description: dateString
+                        }); 
+                    }
+                    return(res);
+                }
+            })
+            return({})
+        })
+    };
+
     const returnCode = () => {
         if (!socket) {
             return undefined;
@@ -214,6 +257,7 @@ function useSocket() {
         joinRoom,
         generateWord,
         selectedWord,
+        submitGuess,
         returnCode
     }
 }
