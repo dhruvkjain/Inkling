@@ -20,7 +20,7 @@ import { useSocket, roomCode } from "../hooks/useSocket.tsx";
 
 function GameMenu() {
 
-  const { createSocketConnection, createRoom, joinRoom, generateWord } = useSocket();
+  const { createSocketConnection, createRoom, joinRoom, generateWord, startcountdown } = useSocket();
   const navigate = useNavigate();
 
   async function initiateSocketConnectionCreateRoom (){
@@ -30,6 +30,9 @@ function GameMenu() {
       setTimeout(async()=>{
         await generateWord();
       }, 20000);
+      (async()=>{
+        await startcountdown();
+      })()
       navigate('/game');
     }
   }

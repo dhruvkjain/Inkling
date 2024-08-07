@@ -77,8 +77,19 @@ function Game() {
       <main className="flex-grow bg-background text-foreground pt-4 pl-8 pr-8 pb-4">
         <div className="w-full h-full grid grid-cols-4 gap-8">
           <div className="bg-card rounded-lg shadow p-6 col-span-3">
-            <h2 className="text-xl font-bold mb-4">Drawing Canvas</h2>
-            <div className="w-full h-full">
+            <div className='flex justify-between items-center'>
+              <h2 className="text-xl font-bold mb-4">Drawing Canvas</h2>
+              <h2 id='timer' className="text-xl font-bold mb-4">
+                Time left: <span id='seconds'>180</span>s
+              </h2>
+            </div>
+            <div className="flex justify-center items-center w-full h-full">
+              <div id='counterbody' className=''>
+                Next word comming in: <span id='counter'>20</span> 
+              </div>
+              <div id='drawarea' className='flex justify-center items-center'>
+                Draw here
+              </div>
             </div>
           </div>
           <div className="bg-card flex flex-col justify-between rounded-lg shadow p-6">

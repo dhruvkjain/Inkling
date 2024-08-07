@@ -1,9 +1,10 @@
 const { instrument } = require('@socket.io/admin-ui');
 const { Server } = require('socket.io');
 
-const { verifyToken } = require('../utils')
+const { verifyToken } = require('../utils');
+const games = require('../models/game.model.js');
 const { createRoom, joinRoom, disconnected, generateWord, setCurrentWord, checkGuess } = require('../services/game.services.js');
-
+const { getData, storeData } = require('../config/redis.js');
 
 function socketConnection(server) {
 
@@ -19,20 +20,22 @@ function socketConnection(server) {
         mode: "development",
     })
 
-    io.use((socket, next)=>{
+    const roomTimers = {}; // Storing all Timeout objects of setIntervals.
+
+    io.use((socket, next) => {
         // console.log(socket.request.headers.cookie);
         const cookies = socket.request.headers.cookie;
-        let token ;
-        cookies.split(';').forEach((ck)=>{
-            token = ( ck.trim().includes('jwt') ) 
-            ? ck.trim().substring(4)
-            : ''
+        let token;
+        cookies.split(';').forEach((ck) => {
+            token = (ck.trim().includes('jwt'))
+                ? ck.trim().substring(4)
+                : ''
         });
 
-        if(token != ''){
+        if (token != '') {
             verifyToken(token, next);
         }
-        else{
+        else {
             next(new Error("Unauthorized - No Token Provided, Re-login"));
         }
     })
@@ -46,62 +49,109 @@ function socketConnection(server) {
         });
 
         socket.on('send-message', (message, socketId) => {
-            console.log(message ,socketId);
+            console.log(message, socketId);
             socket.to(socketId).emit('receive-message', message);
         })
 
-        socket.on('create-room', async(username, profilePic, callback) => {
+        socket.on('create-room', async (username, profilePic, callback) => {
             const gameData = await createRoom(socket.id, username, profilePic);
-            
-            if(gameData.error){
+
+            if (gameData.error) {
                 console.log(gameData.error);
                 callback(gameData);
             }
-            else{
+            else {
                 socket.join(gameData.secretcode);
                 callback(gameData);
             }
         })
 
-        socket.on('join-room', async(username, profilePic, roomId, callback) => {
+        socket.on('join-room', async (username, profilePic, roomId, callback) => {
             const gameData = await joinRoom(socket.id, username, profilePic, roomId);
-            if(gameData.error){
+            if (gameData.error) {
                 // console.log(gameData.error);
                 callback(gameData);
             }
-            else{
+            else {
                 socket.join(roomId);
-                socket.to(roomId).emit("notification",`${username} joined !!`);
+                socket.to(roomId).emit("notification", `${username} joined !!`);
                 socket.to(roomId).emit("update-gameDetails", gameData);
                 callback(gameData);
             }
         })
 
-        socket.on('generate-word', async(secretcode) => {
-            const gameData = await generateWord(secretcode);
-            if(gameData.error){
-                socket.to(secretcode).emit("notification",`Error, Restart game: ${gameData.error}`);
+        socket.on('start-countdown', async (secretcode) => {
+            let countdownTime = 20;
+            const countintervalId = setInterval(() => {
+                if (countdownTime >= 0) {
+                    io.to(secretcode).emit('countdown', countdownTime--);
+                } else {
+                    clearInterval(countintervalId); // Stop the interval when it reaches 0
+                    countdownTime = 20;
+                }
+            }, 1000);
+        })
+
+        socket.on('start-round-timer', async (secretcode) => {
+            if (roomTimers[secretcode] && roomTimers[secretcode].intervalId) {
+                clearInterval(roomTimers[secretcode].intervalId);
             }
-            else{
+            roomTimers[secretcode] = {
+                countdownTime: 180,
+                intervalId: null
+            };
+            roomTimers[secretcode].intervalId = setInterval(async() => {
+                if (roomTimers[secretcode].countdownTime >= 0) {
+                    io.to(secretcode).emit('roundtimer', roomTimers[secretcode].countdownTime--);
+                } else {
+                    clearInterval(roomTimers[secretcode].intervalId); // Stop the interval when it reaches 0
+                    roomTimers[secretcode].countdownTime = 180;
+                    const gameData = await generateWord(secretcode);
+                    if (gameData.error) {
+                        socket.to(secretcode).emit("notification", `Error, Restart game: ${gameData.error}`);
+                    }
+                    else {
+                        io.to(gameData.to).emit("select-word", gameData.words);
+                    }
+                }
+            }, 1000);
+        })
+
+        socket.on('generate-word', async (secretcode) => {
+            const gameData = await generateWord(secretcode);
+            if (gameData.error) {
+                socket.to(secretcode).emit("notification", `Error, Restart game: ${gameData.error}`);
+            }
+            else {
                 io.to(gameData.to).emit("select-word", gameData.words);
             }
         })
- 
-        socket.on('selected-word', async(word, secretcode, callback) => {
+
+        socket.on('selected-word', async (word, secretcode, callback) => {
             const res = await setCurrentWord(word, secretcode);
-            if(res.error){
+            if (res.error) {
                 callback(res);
             }
             callback({});
         })
 
-        socket.on('submit-guess', async(word, secretcode, username, callback) => {
+        socket.on('submit-guess', async (word, secretcode, username, callback) => {
             const res = await checkGuess(word, secretcode, username);
-            if(res.error){
+            if (res.error) {
                 callback(res);
             }
-            if(res.ok){
-                io.to(secretcode).emit("notification",`${username} guessed correctly, word was: ${word}`);
+            if (res.ok) {
+                io.to(secretcode).emit("notification", `${username} guessed correctly, word was: ${word}`);
+                
+                clearInterval(roomTimers[secretcode].intervalId);
+
+                const gameData = await generateWord(secretcode);
+                if (gameData.error) {
+                    socket.to(secretcode).emit("notification", `Error, Restart game: ${gameData.error}`);
+                }
+                else {
+                    io.to(gameData.to).emit("select-word", gameData.words);
+                }
             }
             callback(res);
         })
@@ -114,8 +164,8 @@ function socketConnection(server) {
             console.log(`disconnected bcz ${reason}, ${socket.id}`);
         });
 
-        socket.on("leave-game" , (secretcode)=>{
-            disconnected(socket.id,secretcode);
+        socket.on("leave-game", (secretcode) => {
+            disconnected(socket.id, secretcode);
         })
 
         socket.on("connect_error", (err) => {

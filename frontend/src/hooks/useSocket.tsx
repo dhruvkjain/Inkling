@@ -36,29 +36,57 @@ function useSocket() {
             withCredentials: true // to pass cookies to socket
         });
 
-        socket.on("select-word", gameData => {
-            setWords(gameData);
-            setOpenDialog(true);
+        socket.on("notification", message => {
+            const { dateString } = date();
+            toast(message, {
+                description: dateString
+            });
         })
 
         socket.on("update-gameDetails", gameData => {
             setGameDetails(gameData);
         })
 
-        socket.on("notification", message => {
-            const { dateString } = date();
-            toast(message, {
-                description: dateString
-            });
+        socket.on("countdown", time => {
+            if (time > 0) {
+                const counterInput = document.getElementById('counter') as HTMLSpanElement;
+                counterInput.innerHTML = (time).toString();
+            } else {
+                const counterbody = document.getElementById('counterbody') as HTMLDivElement;
+                counterbody.style.display = 'none';
+                const drawarea = document.getElementById('drawarea') as HTMLDivElement;
+                drawarea.style.display = 'block';
+            }
         });
-        
+
+        socket.on("roundtimer", async(time) => {
+            const timer = document.getElementById('timer') as HTMLHeadingElement;
+            timer.style.display = 'block';
+            const drawarea = document.getElementById('drawarea') as HTMLDivElement;
+            drawarea.style.display = 'block';
+            const seconds = document.getElementById('seconds') as HTMLSpanElement;
+            if (time > 0) {
+                seconds.innerHTML = (time).toString();
+            } else {
+                timer.style.display = 'none';
+                seconds.innerHTML = '180';
+                const drawarea = document.getElementById('drawarea') as HTMLDivElement;
+                drawarea.style.display = 'none';
+            }
+        });
+
+        socket.on("select-word", gameData => {
+            setWords(gameData);
+            setOpenDialog(true);
+        })
+
         window.addEventListener('beforeunload', () => {
-            if(socket)
+            if (socket)
                 socket.emit('leave-game', joinRoomCode);
         });
 
         socket.on("connect_error", err => {
-            if(err.message === 'xhr poll error'){
+            if (err.message === 'xhr poll error') {
                 const { dateString } = date();
                 toast(`Failed : Server Connection Error`, {
                     description: dateString
@@ -75,7 +103,7 @@ function useSocket() {
     const createRoom = (): Promise<roomCode> => {
         return new Promise((resolve) => {
             if (!socket) {
-                resolve({ error: "No socket conncetion" });
+                resolve({ error: "No socket connection" });
                 return;
             }
 
@@ -109,10 +137,10 @@ function useSocket() {
         })
     };
 
-    const joinRoom = (roomId:string): Promise<roomCode> => {
+    const joinRoom = (roomId: string): Promise<roomCode> => {
         return new Promise((resolve) => {
             if (!socket) {
-                resolve({ error: "No socket conncetion" });
+                resolve({ error: "No socket connection" });
                 return;
             }
 
@@ -146,10 +174,31 @@ function useSocket() {
         })
     };
 
+    const startcountdown = (): Promise<errorMessage> => {
+        return new Promise((resolve) => {
+            if (!socket) {
+                resolve({ error: "No socket connection" });
+                return;
+            }
+
+            if (authUser === undefined) {
+                const { dateString } = date();
+                toast(`Failed to Start countdown : Login first`, {
+                    description: dateString
+                });
+                resolve({ error: "No Auth User" });
+                return;
+            }
+
+            socket.emit('start-countdown', joinRoomCode);
+            resolve({})
+        })
+    };
+
     const generateWord = (): Promise<errorMessage> => {
         return new Promise((resolve) => {
             if (!socket) {
-                resolve({ error: "No socket conncetion" });
+                resolve({ error: "No socket connection" });
                 return;
             }
 
@@ -167,10 +216,10 @@ function useSocket() {
         })
     };
 
-    const selectedWord = (word:string): Promise<errorMessage> => {
+    const selectedWord = (word: string): Promise<errorMessage> => {
         return new Promise((resolve) => {
             if (!socket) {
-                resolve({ error: "No socket conncetion" });
+                resolve({ error: "No socket connection" });
                 return;
             }
 
@@ -190,7 +239,7 @@ function useSocket() {
                         description: dateString
                     });
                     setOpenDialog(false);
-                    return({ error: res.error });
+                    return ({ error: res.error });
                 }
                 else {
                     const { dateString } = date();
@@ -198,17 +247,19 @@ function useSocket() {
                         description: dateString
                     });
                     setOpenDialog(false);
-                    return({});
+
+                    socket.emit('start-round-timer', joinRoomCode);
+                    return ({});
                 }
             })
-            return({})
+            return ({})
         })
     };
 
-    const submitGuess = (word:string): Promise<guessResponse> => {
+    const submitGuess = (word: string): Promise<guessResponse> => {
         return new Promise((resolve) => {
             if (!socket) {
-                resolve({ error: "No socket conncetion" });
+                resolve({ error: "No socket connection" });
                 return;
             }
 
@@ -228,19 +279,27 @@ function useSocket() {
                     toast(`Error Rejoin please: ${res.error}`, {
                         description: dateString
                     });
-                    return({ error: res.error });
+                    return ({ error: res.error });
                 }
                 else {
-                    if(!res.ok){
+                    if (!res.ok) {
                         const { dateString } = date();
                         toast(`Wrong guess: ${word}`, {
                             description: dateString
-                        }); 
+                        });
                     }
-                    return(res);
+                    else {
+                        const timer = document.getElementById('timer') as HTMLHeadingElement;
+                        timer.style.display = 'none';
+                        const drawarea = document.getElementById('drawarea') as HTMLDivElement;
+                        drawarea.style.display = 'none';
+                        const seconds = document.getElementById('seconds') as HTMLSpanElement;
+                        seconds.innerHTML = '180';
+                    }
+                    return (res);
                 }
             })
-            return({})
+            return ({})
         })
     };
 
@@ -255,6 +314,7 @@ function useSocket() {
         createSocketConnection,
         createRoom,
         joinRoom,
+        startcountdown,
         generateWord,
         selectedWord,
         submitGuess,
