@@ -3,8 +3,9 @@ import { toast } from "sonner";
 import { date } from "../utils/date.ts";
 import { io, Socket } from 'socket.io-client';
 
-import { useAuthContext, AuthContextType } from "../context/AuthContext";
+import { useAuthContext, AuthContextType } from "../context/AuthContext.tsx";
 import { gameResponse, useGameContext, GameContextType } from "../context/GameContext.tsx";
+import { useDraw } from "./useDraw.ts";
 
 export type roomCode = {
     error?: string;
@@ -29,6 +30,7 @@ function useSocket() {
 
     const { authUser } = useAuthContext() as AuthContextType;
     const { setGameDetails, setOpenDialog, setWords } = useGameContext() as GameContextType;
+    const { clearCanvas } = useDraw();
 
     const createSocketConnection = () => {
         if (socket) return;   // Prevent re-initialization
@@ -56,6 +58,13 @@ function useSocket() {
                 counterbody.style.display = 'none';
                 const drawarea = document.getElementById('drawarea') as HTMLDivElement;
                 drawarea.style.display = 'block';
+                const b1w = document.getElementById('drawarea')?.offsetWidth;
+                const b1h = document.getElementById('drawarea')?.offsetHeight;
+                const canvas = document.getElementById('canvasarea') as HTMLCanvasElement;
+                if (b1w && b1h) {
+                    canvas.width = b1w; 
+                    canvas.height = b1h - 50;
+                }
             }
         });
 
@@ -72,6 +81,7 @@ function useSocket() {
                 seconds.innerHTML = '180';
                 const drawarea = document.getElementById('drawarea') as HTMLDivElement;
                 drawarea.style.display = 'none';
+                clearCanvas();
             }
         });
 
@@ -295,6 +305,7 @@ function useSocket() {
                         drawarea.style.display = 'none';
                         const seconds = document.getElementById('seconds') as HTMLSpanElement;
                         seconds.innerHTML = '180';
+                        clearCanvas();
                     }
                     return (res);
                 }

@@ -21,19 +21,22 @@ import {
 } from "@/components/ui/alert-dialog"
 
 import { useGameContext, GameContextType } from "../context/GameContext.tsx";
-import { useSocket, errorMessage, guessResponse } from '../hooks/useSocket.tsx';
+import { useSocket, errorMessage, guessResponse } from '../hooks/useSocket.ts';
+import { useDraw } from '../hooks/useDraw.ts';
 
 function Game() {
 
   const { gameDetails, openDialog, setOpenDialog, words } = useGameContext() as GameContextType;
   const navigate = useNavigate();
   const { selectedWord, submitGuess } = useSocket();
+  
+  const { canvasRef, onMouseDown, clearCanvas } = useDraw();
 
   useEffect(() => {
     if (gameDetails?.secretcode === undefined) {
       navigate('/game');
     }
-  });
+  }, []);
 
   async function sendSelectedWord(word:string){
     console.log(word);
@@ -79,16 +82,24 @@ function Game() {
           <div className="bg-card rounded-lg shadow p-6 col-span-3">
             <div className='flex justify-between items-center'>
               <h2 className="text-xl font-bold mb-4">Drawing Canvas</h2>
-              <h2 id='timer' className="text-xl font-bold mb-4">
-                Time left: <span id='seconds'>180</span>s
-              </h2>
+              <div id='timer' className="w-full text-xl font-bold mb-4">
+                <div className='flex justify-end w-full pl-[100px]'>
+                  <h2>Time left: <span id='seconds'>180</span>s</h2>
+                  <Button className='ml-10' onClick={clearCanvas}>Clear Canvas</Button>
+                </div>
+              </div>
             </div>
             <div className="flex justify-center items-center w-full h-full">
               <div id='counterbody' className=''>
                 Next word comming in: <span id='counter'>20</span> 
               </div>
-              <div id='drawarea' className='flex justify-center items-center'>
-                Draw here
+              <div id='drawarea' className='flex justify-center items-center w-full h-full'>
+                <canvas 
+                  onMouseDown={onMouseDown} 
+                  id="canvasarea" 
+                  ref={canvasRef} 
+                  className='border border-white rounded-md' 
+                />
               </div>
             </div>
           </div>

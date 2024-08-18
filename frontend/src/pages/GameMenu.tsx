@@ -16,7 +16,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 
-import { useSocket, roomCode } from "../hooks/useSocket.tsx";
+import { useSocket, roomCode } from "../hooks/useSocket.ts";
 
 function GameMenu() {
 

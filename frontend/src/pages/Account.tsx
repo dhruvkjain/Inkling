@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tabs"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
-import { useAuth } from "../hooks/useAuth"
+import { useAuth } from "../hooks/useAuth.ts"
 
 function Account() {
 

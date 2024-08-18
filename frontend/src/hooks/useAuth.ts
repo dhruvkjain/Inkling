@@ -1,10 +1,10 @@
 import { useState, useCallback } from "react";
 
-import { httpSignup, httpLogin, httpLogout } from "./request";
+import { httpSignup, httpLogin, httpLogout } from "./request.ts";
 import { date } from "../utils/date.ts";
 
 import { toast } from "sonner"
-import { useAuthContext, AuthContextType } from "../context/AuthContext";
+import { useAuthContext, AuthContextType } from "../context/AuthContext.tsx";
 
 function useAuth(){
     const [isLoggedIn, setLoggedIn] = useState<boolean>(false);
