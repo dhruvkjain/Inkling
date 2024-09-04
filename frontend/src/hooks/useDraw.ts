@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 
 export type Draw = {
     ctx: CanvasRenderingContext2D;
@@ -16,10 +16,11 @@ export type Point = {
     y:number;
 }
 
+import { useGameContext, GameContextType } from "../context/GameContext.tsx";
+
 const useDraw = (drawLine:({currentPoint, prevPoint}:DrawPoints)=>void) =>{
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const prevPoint = useRef<null | Point>(null);
-    const [mouseDown, setMouseDown] = useState<boolean>(false);
+    
+    const { canvasRef, prevPoint, mouseDown, setMouseDown, } = useGameContext() as GameContextType;
 
     const onMouseDown =()=>{setMouseDown(true)}
     const mouseUphandler =()=>{

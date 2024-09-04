@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -106,4 +108,4 @@ function Account() {
   )
 }
 
-export default Account;
+export default memo(Account);

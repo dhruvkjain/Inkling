@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from "@/components/ui/button"
@@ -90,4 +91,4 @@ function GameMenu() {
   )
 }
 
-export default GameMenu
+export default memo(GameMenu)

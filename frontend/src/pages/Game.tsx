@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Input } from "@/components/ui/input"
@@ -161,4 +161,4 @@ function Game() {
   )
 }
 
-export default Game
+export default memo(Game)

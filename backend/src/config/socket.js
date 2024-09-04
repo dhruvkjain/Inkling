@@ -4,7 +4,6 @@ const { Server } = require('socket.io');
 const { verifyToken } = require('../utils');
 const games = require('../models/game.model.js');
 const { createRoom, joinRoom, disconnected, generateWord, setCurrentWord, checkGuess } = require('../services/game.services.js');
-const { getData, storeData } = require('../config/redis.js');
 
 function socketConnection(server) {
 
@@ -154,6 +153,10 @@ function socketConnection(server) {
                 }
             }
             callback(res);
+        })
+
+        socket.on('draw-line', async(prevPoint, currentPoint, secretcode) => {
+            socket.to(secretcode).emit('draw-line', {prevPoint, currentPoint})
         })
 
         // socket.onAny((event, ...args) => {

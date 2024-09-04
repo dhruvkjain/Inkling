@@ -5,7 +5,7 @@ import { io, Socket } from 'socket.io-client';
 
 import { useAuthContext, AuthContextType } from "../context/AuthContext.tsx";
 import { gameResponse, useGameContext, GameContextType } from "../context/GameContext.tsx";
-import { useDraw, DrawPoints } from "./useDraw.ts";
+import { useDraw, DrawPoints, Draw } from "./useDraw.ts";
 
 export type roomCode = {
     error?: string;
@@ -30,7 +30,7 @@ function useSocket() {
 
     const { authUser } = useAuthContext() as AuthContextType;
     const { setGameDetails, setOpenDialog, setWords } = useGameContext() as GameContextType;
-    const { clearCanvas } = useDraw(drawLine);
+    const { clearCanvas, canvasRef } = useDraw(drawLine);
 
     const createSocketConnection = () => {
         if (socket) return;   // Prevent re-initialization
@@ -109,6 +109,38 @@ function useSocket() {
                 clearCanvas();
             }
         });
+
+        socket.on('draw-line', ({prevPoint, currentPoint}:DrawPoints)=>{
+            const canvas = canvasRef.current;
+            if(!canvas){
+                return;
+            }
+    
+            const ctx = canvas.getContext('2d');
+            if(!ctx){
+                return;
+            }
+            
+            function onDraw({ctx, currentPoint, prevPoint}:Draw){
+                const { x:currX, y:currY } = currentPoint;
+                const lineColor = '#ffff';
+                const lineWidth = 5;
+            
+                const startPoint = prevPoint ?? currentPoint;
+                ctx.beginPath();
+                ctx.lineWidth = lineWidth;
+                ctx.strokeStyle = lineColor;
+                ctx.moveTo(startPoint.x , startPoint.y);
+                ctx.lineTo(currX, currY);
+                ctx.stroke();
+            
+                ctx.fillStyle = lineColor;
+                ctx.beginPath();
+                ctx.arc(startPoint.x, startPoint.y, 2, 0, 2*Math.PI);
+                ctx.fill();
+            }
+            onDraw({ctx, currentPoint, prevPoint});
+        })
 
         socket.on("select-word", gameData => {
             setWords(gameData);

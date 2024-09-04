@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useRef, ReactNode, MutableRefObject } from "react";
 
 export type player = {
     username: string;
@@ -12,6 +12,11 @@ export type gameResponse = {
     error?: string;
 }
 
+type Point = {
+    x:number;
+    y:number;
+}
+
 type words = [string] | undefined
 
 export type GameContextType = {
@@ -21,6 +26,10 @@ export type GameContextType = {
     setOpenDialog: (open: boolean) => void;
     words: [string] | undefined;
     setWords: (words: words) => void;
+    canvasRef: MutableRefObject<HTMLCanvasElement | null>;
+    prevPoint: MutableRefObject<Point | null>;
+    mouseDown: boolean;
+    setMouseDown: (newValue: boolean) => void;
 }
 type ContextProps = {
     children: ReactNode;
@@ -33,10 +42,26 @@ function GameContextProvider({ children }: ContextProps) {
     const [gameDetails, setGameDetails] = useState<gameResponse | undefined>(undefined);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [words, setWords] = useState<words>(undefined);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const prevPoint = useRef<null | Point>(null);
+    const [mouseDown, setMouseDown] = useState<boolean>(false);
 
-    return <GameContext.Provider value={{ gameDetails, setGameDetails, openDialog, setOpenDialog, words, setWords }}>
-        {children}
-    </GameContext.Provider>
+    return (
+        <GameContext.Provider value={{
+            gameDetails,
+            setGameDetails,
+            openDialog,
+            setOpenDialog,
+            words,
+            setWords,
+            canvasRef,
+            prevPoint,
+            mouseDown,
+            setMouseDown,
+        }}>
+            {children}
+        </GameContext.Provider>
+    )
 }
 
 function useGameContext() {
