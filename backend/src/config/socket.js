@@ -81,13 +81,13 @@ function socketConnection(server) {
         })
 
         socket.on('start-countdown', async (secretcode) => {
-            let countdownTime = 20;
+            let countdownTime = 5;
             const countintervalId = setInterval(() => {
                 if (countdownTime >= 0) {
                     io.to(secretcode).emit('countdown', countdownTime--);
                 } else {
                     clearInterval(countintervalId); // Stop the interval when it reaches 0
-                    countdownTime = 20;
+                    countdownTime = 5;
                 }
             }, 1000);
         })

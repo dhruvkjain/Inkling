@@ -6,12 +6,17 @@ export type Draw = {
     prevPoint : null | Point;
 }
 
+export type DrawPoints = {
+    currentPoint: Point;
+    prevPoint : null | Point;
+}
+
 export type Point = {
     x:number;
     y:number;
 }
 
-const useDraw = () =>{
+const useDraw = (drawLine:({currentPoint, prevPoint}:DrawPoints)=>void) =>{
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const prevPoint = useRef<null | Point>(null);
     const [mouseDown, setMouseDown] = useState<boolean>(false);
@@ -22,6 +27,7 @@ const useDraw = () =>{
         prevPoint.current = null;
     }
     const clearCanvas = () =>{
+        console.log('clear canvas');
         const canvas = canvasRef.current;
         if(!canvas) return;
 
@@ -48,7 +54,7 @@ const useDraw = () =>{
         ctx.beginPath();
         ctx.arc(startPoint.x, startPoint.y, 2, 0, 2*Math.PI);
         ctx.fill();
-      }
+    }
 
     useEffect(()=>{
         const mouseMovehandler =(e:MouseEvent)=>{
@@ -59,6 +65,7 @@ const useDraw = () =>{
             if(!ctx || !currentPoint) return;
 
             onDraw({ctx, currentPoint, prevPoint:prevPoint.current});
+            drawLine({currentPoint, prevPoint:prevPoint.current});
             prevPoint.current = currentPoint;
         }
 

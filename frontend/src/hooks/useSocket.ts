@@ -5,7 +5,7 @@ import { io, Socket } from 'socket.io-client';
 
 import { useAuthContext, AuthContextType } from "../context/AuthContext.tsx";
 import { gameResponse, useGameContext, GameContextType } from "../context/GameContext.tsx";
-import { useDraw } from "./useDraw.ts";
+import { useDraw, DrawPoints } from "./useDraw.ts";
 
 export type roomCode = {
     error?: string;
@@ -30,7 +30,7 @@ function useSocket() {
 
     const { authUser } = useAuthContext() as AuthContextType;
     const { setGameDetails, setOpenDialog, setWords } = useGameContext() as GameContextType;
-    const { clearCanvas } = useDraw();
+    const { clearCanvas } = useDraw(drawLine);
 
     const createSocketConnection = () => {
         if (socket) return;   // Prevent re-initialization
@@ -49,14 +49,24 @@ function useSocket() {
             setGameDetails(gameData);
         })
 
+        let flag1 = 0;
         socket.on("countdown", time => {
+            const counterbody = document.getElementById('counterbody') as HTMLDivElement;
+            const drawarea = document.getElementById('drawarea') as HTMLDivElement;
+            function showhide(){
+                const counterbody = document.getElementById('counterbody') as HTMLDivElement;
+                counterbody.style.display = 'block';
+                drawarea.style.display = 'none';
+                flag1 = 1;
+            }
+            if(flag1 == 0){showhide()}
+
             if (time > 0) {
                 const counterInput = document.getElementById('counter') as HTMLSpanElement;
                 counterInput.innerHTML = (time).toString();
             } else {
-                const counterbody = document.getElementById('counterbody') as HTMLDivElement;
+                console.log('round start');
                 counterbody.style.display = 'none';
-                const drawarea = document.getElementById('drawarea') as HTMLDivElement;
                 drawarea.style.display = 'block';
                 const b1w = document.getElementById('drawarea')?.offsetWidth;
                 const b1h = document.getElementById('drawarea')?.offsetHeight;
@@ -68,12 +78,27 @@ function useSocket() {
             }
         });
 
+        let flag2 = 0;
         socket.on("roundtimer", async(time) => {
             const timer = document.getElementById('timer') as HTMLHeadingElement;
-            timer.style.display = 'block';
+            const counterbody = document.getElementById('counterbody') as HTMLDivElement;
             const drawarea = document.getElementById('drawarea') as HTMLDivElement;
-            drawarea.style.display = 'block';
             const seconds = document.getElementById('seconds') as HTMLSpanElement;
+            function showhide(){
+                timer.style.display = 'block';
+                counterbody.style.display = 'none';
+                drawarea.style.display = 'block';
+                const b1w = document.getElementById('drawarea')?.offsetWidth;
+                const b1h = document.getElementById('drawarea')?.offsetHeight;
+                const canvas = document.getElementById('canvasarea') as HTMLCanvasElement;
+                if (b1w && b1h) {
+                    canvas.width = b1w; 
+                    canvas.height = b1h - 50;
+                }
+                flag2 = 1;
+            }
+            if(flag2 == 0){showhide()}
+            
             if (time > 0) {
                 seconds.innerHTML = (time).toString();
             } else {
@@ -282,7 +307,6 @@ function useSocket() {
                 return;
             }
 
-            console.log(word);
             socket.emit('submit-guess', word, joinRoomCode, authUser.username, (res: guessResponse) => {
                 if (res.error) {
                     const { dateString } = date();
@@ -314,6 +338,22 @@ function useSocket() {
         })
     };
 
+    function drawLine({currentPoint, prevPoint}:DrawPoints){
+        if (!socket) {
+            return;
+        }
+
+        if (authUser === undefined) {
+            const { dateString } = date();
+            toast(`Failed to submit guess : Login first`, {
+                description: dateString
+            });
+            return;
+        }
+
+        socket.emit('draw-line', currentPoint, prevPoint, joinRoomCode);
+    }
+
     const returnCode = () => {
         if (!socket) {
             return undefined;
@@ -329,6 +369,7 @@ function useSocket() {
         generateWord,
         selectedWord,
         submitGuess,
+        drawLine,
         returnCode
     }
 }

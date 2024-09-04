@@ -1,9 +1,3 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/n7Db7XIz79G
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
-
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -28,9 +22,9 @@ function Game() {
 
   const { gameDetails, openDialog, setOpenDialog, words } = useGameContext() as GameContextType;
   const navigate = useNavigate();
-  const { selectedWord, submitGuess } = useSocket();
+  const { selectedWord, submitGuess, drawLine } = useSocket();
   
-  const { canvasRef, onMouseDown, clearCanvas } = useDraw();
+  const { canvasRef, onMouseDown, clearCanvas } = useDraw(drawLine);
 
   useEffect(() => {
     if (gameDetails?.secretcode === undefined) {
@@ -81,16 +75,20 @@ function Game() {
         <div className="w-full h-full grid grid-cols-4 gap-8">
           <div className="bg-card rounded-lg shadow p-6 col-span-3">
             <div className='flex justify-between items-center'>
-              <h2 className="text-xl font-bold mb-4">Drawing Canvas</h2>
-              <div id='timer' className="w-full text-xl font-bold mb-4">
-                <div className='flex justify-end w-full pl-[100px]'>
-                  <h2>Time left: <span id='seconds'>180</span>s</h2>
-                  <Button className='ml-10' onClick={clearCanvas}>Clear Canvas</Button>
+              <div className='w-full'>
+                <h2 className="text-xl font-bold mb-4">Drawing Canvas</h2>
+              </div>
+              <div className="w-full text-xl font-bold mb-4">
+                <div id='timer' className="w-full">
+                  <div className='flex justify-end w-full pl-[100px]'>
+                    <h2>Time left: <span id='seconds'>180</span>s</h2>
+                    <Button className='ml-10' onClick={clearCanvas}>Clear Canvas</Button>
+                  </div>
                 </div>
               </div>
             </div>
             <div className="flex justify-center items-center w-full h-full">
-              <div id='counterbody' className=''>
+              <div id='counterbody' className='hidden'>
                 Next word comming in: <span id='counter'>20</span> 
               </div>
               <div id='drawarea' className='flex justify-center items-center w-full h-full'>
