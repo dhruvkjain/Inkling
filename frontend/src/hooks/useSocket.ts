@@ -29,7 +29,7 @@ let joinRoomCode: string | undefined;
 function useSocket() {
 
     const { authUser } = useAuthContext() as AuthContextType;
-    const { setGameDetails, setOpenDialog, setWords } = useGameContext() as GameContextType;
+    const { setGameDetails, setOpenDialog, setWords, setIsEditor, isEditor } = useGameContext() as GameContextType;
     const { clearCanvas, canvasRef } = useDraw(drawLine, clearAllCanvas);
 
     const createSocketConnection = () => {
@@ -75,6 +75,7 @@ function useSocket() {
                     canvas.width = b1w; 
                     canvas.height = b1h - 50;
                 }
+                flag1 = 0;
             }
         });
 
@@ -102,11 +103,13 @@ function useSocket() {
             if (time > 0) {
                 seconds.innerHTML = (time).toString();
             } else {
+                setIsEditor(false);
                 timer.style.display = 'none';
                 seconds.innerHTML = '180';
                 const drawarea = document.getElementById('drawarea') as HTMLDivElement;
                 drawarea.style.display = 'none';
                 clearCanvas();
+                flag2 = 0;
             }
         });
 
@@ -149,6 +152,14 @@ function useSocket() {
         socket.on("select-word", gameData => {
             setWords(gameData);
             setOpenDialog(true);
+        })
+
+        socket.on("correct-guess", message => {
+            setIsEditor(false);
+            const { dateString } = date();
+            toast(message, {
+                description: dateString
+            });
         })
 
         window.addEventListener('beforeunload', () => {
@@ -313,6 +324,7 @@ function useSocket() {
                     return ({ error: res.error });
                 }
                 else {
+                    setIsEditor(true);
                     const { dateString } = date();
                     toast(`Start to draw word: ${word}`, {
                         description: dateString
@@ -340,6 +352,15 @@ function useSocket() {
                     description: dateString
                 });
                 resolve({ error: "No Auth User" });
+                return;
+            }
+
+            if (isEditor === true) {
+                const { dateString } = date();
+                toast(`You are drawing: Submit guess denied`, {
+                    description: dateString
+                });
+                resolve({ error: "You are drawing" });
                 return;
             }
 

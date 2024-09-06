@@ -140,7 +140,7 @@ function socketConnection(server) {
                 callback(res);
             }
             if (res.ok) {
-                io.to(secretcode).emit("notification", `${username} guessed correctly, word was: ${word}`);
+                io.to(secretcode).emit("correct-guess", `${username} guessed correctly, word was: ${word}`);
                 
                 clearInterval(roomTimers[secretcode].intervalId);
 

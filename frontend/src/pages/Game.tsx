@@ -20,7 +20,7 @@ import { useDraw } from '../hooks/useDraw.ts';
 
 function Game() {
 
-  const { gameDetails, openDialog, setOpenDialog, words } = useGameContext() as GameContextType;
+  const { gameDetails, openDialog, setOpenDialog, words, isEditor } = useGameContext() as GameContextType;
   const navigate = useNavigate();
   const { selectedWord, submitGuess, drawLine, clearAllCanvas } = useSocket();
   
@@ -82,7 +82,11 @@ function Game() {
                 <div id='timer' className="w-full">
                   <div className='flex justify-end w-full pl-[100px]'>
                     <h2>Time left: <span id='seconds'>180</span>s</h2>
-                    <Button className='ml-10' onClick={clearCanvasForAll}>Clear Canvas</Button>
+                    {
+                      isEditor 
+                      ? <Button className='ml-10' onClick={clearCanvasForAll}>Clear Canvas</Button>
+                      : <></>
+                    }
                   </div>
                 </div>
               </div>

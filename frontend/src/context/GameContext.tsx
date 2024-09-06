@@ -21,6 +21,8 @@ type words = [string] | undefined
 
 export type GameContextType = {
     gameDetails: gameResponse | undefined;
+    isEditor: boolean;
+    setIsEditor: (newValue: boolean) => void;
     setGameDetails: (newValue: gameResponse | undefined) => void;
     openDialog: boolean;
     setOpenDialog: (open: boolean) => void;
@@ -40,6 +42,7 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 function GameContextProvider({ children }: ContextProps) {
 
     const [gameDetails, setGameDetails] = useState<gameResponse | undefined>(undefined);
+    const [isEditor, setIsEditor] = useState<boolean>(false);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [words, setWords] = useState<words>(undefined);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -49,6 +52,8 @@ function GameContextProvider({ children }: ContextProps) {
     return (
         <GameContext.Provider value={{
             gameDetails,
+            isEditor,
+            setIsEditor,
             setGameDetails,
             openDialog,
             setOpenDialog,
