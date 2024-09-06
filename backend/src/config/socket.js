@@ -159,6 +159,10 @@ function socketConnection(server) {
             socket.to(secretcode).emit('draw-line', {prevPoint, currentPoint})
         })
 
+        socket.on("clear-canvas", (secretcode) => {
+            socket.to(secretcode).emit('clear-canvas');
+        })
+
         // socket.onAny((event, ...args) => {
         //     console.log(event, args);
         // });

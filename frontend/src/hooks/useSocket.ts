@@ -30,7 +30,7 @@ function useSocket() {
 
     const { authUser } = useAuthContext() as AuthContextType;
     const { setGameDetails, setOpenDialog, setWords } = useGameContext() as GameContextType;
-    const { clearCanvas, canvasRef } = useDraw(drawLine);
+    const { clearCanvas, canvasRef } = useDraw(drawLine, clearAllCanvas);
 
     const createSocketConnection = () => {
         if (socket) return;   // Prevent re-initialization
@@ -140,6 +140,10 @@ function useSocket() {
                 ctx.fill();
             }
             onDraw({ctx, currentPoint, prevPoint});
+        })
+
+        socket.on("clear-canvas", () => {
+            clearCanvas();
         })
 
         socket.on("select-word", gameData => {
@@ -386,6 +390,22 @@ function useSocket() {
         socket.emit('draw-line', currentPoint, prevPoint, joinRoomCode);
     }
 
+    function clearAllCanvas(){
+        if (!socket) {
+            return;
+        }
+
+        if (authUser === undefined) {
+            const { dateString } = date();
+            toast(`Failed to submit guess : Login first`, {
+                description: dateString
+            });
+            return;
+        }
+
+        socket.emit('clear-canvas', joinRoomCode);
+    }
+
     const returnCode = () => {
         if (!socket) {
             return undefined;
@@ -402,6 +422,7 @@ function useSocket() {
         selectedWord,
         submitGuess,
         drawLine,
+        clearAllCanvas,
         returnCode
     }
 }

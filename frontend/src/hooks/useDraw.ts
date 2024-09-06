@@ -18,7 +18,7 @@ export type Point = {
 
 import { useGameContext, GameContextType } from "../context/GameContext.tsx";
 
-const useDraw = (drawLine:({currentPoint, prevPoint}:DrawPoints)=>void) =>{
+const useDraw = (drawLine:({currentPoint, prevPoint}:DrawPoints)=>void , clearAllCanvas:()=>void) =>{
     
     const { canvasRef, prevPoint, mouseDown, setMouseDown, } = useGameContext() as GameContextType;
 
@@ -27,14 +27,22 @@ const useDraw = (drawLine:({currentPoint, prevPoint}:DrawPoints)=>void) =>{
         setMouseDown(false)
         prevPoint.current = null;
     }
-    const clearCanvas = () =>{
-        console.log('clear canvas');
+    const clearCanvasForAll = () =>{
         const canvas = canvasRef.current;
         if(!canvas) return;
 
         const ctx = canvas.getContext('2d');
         if(!ctx) return;
+        clearAllCanvas();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
 
+    const clearCanvas = () =>{
+        const canvas = canvasRef.current;
+        if(!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if(!ctx) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
@@ -94,7 +102,8 @@ const useDraw = (drawLine:({currentPoint, prevPoint}:DrawPoints)=>void) =>{
     return{
         canvasRef,
         onMouseDown,
-        clearCanvas
+        clearCanvas,
+        clearCanvasForAll
     }
 }
 
