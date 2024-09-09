@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { ClockIcon, TrophyIcon, UsersIcon } from "../components/Icons.tsx";
+import { TrophyIcon, UsersIcon } from "../components/Icons.tsx";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -15,12 +15,14 @@ import {
 } from "@/components/ui/alert-dialog"
 
 import { useGameContext, GameContextType } from "../context/GameContext.tsx";
+import { useAuthContext, AuthContextType } from "../context/AuthContext.tsx";
 import { useSocket, errorMessage, guessResponse } from '../hooks/useSocket.ts';
 import { useDraw } from '../hooks/useDraw.ts';
 
 function Game() {
 
   const { gameDetails, openDialog, setOpenDialog, words, isEditor } = useGameContext() as GameContextType;
+  const { authUser } = useAuthContext() as AuthContextType;
   const navigate = useNavigate();
   const { selectedWord, submitGuess, drawLine, clearAllCanvas } = useSocket();
   
@@ -81,7 +83,7 @@ function Game() {
               <div className="w-full text-xl font-bold mb-4">
                 <div id='timer' className="w-full">
                   <div className='flex justify-end w-full pl-[100px]'>
-                    <h2>Time left: <span id='seconds'>180</span>s</h2>
+                    <h2>Time left: <span id='seconds'>120</span>s</h2>
                     {
                       isEditor 
                       ? <Button className='ml-10' onClick={clearCanvasForAll}>Clear Canvas</Button>
@@ -132,8 +134,12 @@ function Game() {
             </div>
             <div className='pt-2 rounded-lg'>
               <div className="flex w-full justify-between items-center">
-                <Input className='mr-4' id="guess" placeholder="your guess ...." />
-                <Button onClick={()=>{sendSubmitGuess()}}>Send</Button>
+                {
+                  isEditor ? <></> : <>
+                    <Input className='mr-4' id="guess" placeholder="your guess ...." />
+                    <Button onClick={()=>{sendSubmitGuess()}}>Send</Button>
+                  </>
+                }
               </div>
             </div>
           </div>
@@ -142,13 +148,13 @@ function Game() {
       <footer className="bg-card text-foreground p-4 shadow">
         <div className="container flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <ClockIcon className="w-5 h-5" />
               <span>00:45</span>
-            </div>
+            </div> */}
             <div className="flex items-center gap-2">
               <TrophyIcon className="w-5 h-5" />
-              <span>Score: 120</span>
+              <span>Score: {(gameDetails?.players?.find(obj => obj.username == authUser?.username))?.score}</span>
             </div>
             <div className="flex items-center gap-2">
               <UsersIcon className="w-5 h-5" />

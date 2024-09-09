@@ -17,13 +17,22 @@ export type Point = {
 }
 
 import { useGameContext, GameContextType } from "../context/GameContext.tsx";
+import { useCanvasContext, CanvasContextType } from "../context/CanvasContext.tsx";
 
 const useDraw = (drawLine:({currentPoint, prevPoint}:DrawPoints)=>void , clearAllCanvas:()=>void) =>{
     
-    const { canvasRef, prevPoint, mouseDown, setMouseDown, } = useGameContext() as GameContextType;
+    // const { canvasRef, prevPoint, mouseDown, setMouseDown, isEditor } = useGameContext() as GameContextType;
+    const { isEditor } = useGameContext() as GameContextType;
+    const { canvasRef, prevPoint, mouseDown, setMouseDown } = useCanvasContext() as CanvasContextType;
 
-    const onMouseDown =()=>{setMouseDown(true)}
+    const onMouseDown =()=>{
+        if(!isEditor) return;
+        if(mouseDown) return;
+        setMouseDown(true)
+    }
     const mouseUphandler =()=>{
+        if(!isEditor) return;
+        if(!mouseDown) return;
         setMouseDown(false)
         prevPoint.current = null;
     }
@@ -67,6 +76,7 @@ const useDraw = (drawLine:({currentPoint, prevPoint}:DrawPoints)=>void , clearAl
 
     useEffect(()=>{
         const mouseMovehandler =(e:MouseEvent)=>{
+            if(!isEditor) return;
             if(!mouseDown) return;
             const currentPoint = computePointRelativeToCanvas(e);
 

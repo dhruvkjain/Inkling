@@ -32,6 +32,7 @@ function useSocket() {
     const { setGameDetails, setOpenDialog, setWords, setIsEditor, isEditor } = useGameContext() as GameContextType;
     const { clearCanvas, canvasRef } = useDraw(drawLine, clearAllCanvas);
 
+    let flag2 = 0;
     const createSocketConnection = () => {
         if (socket) return;   // Prevent re-initialization
         socket = io('http://localhost:3000', {
@@ -79,7 +80,6 @@ function useSocket() {
             }
         });
 
-        let flag2 = 0;
         socket.on("roundtimer", async(time) => {
             const timer = document.getElementById('timer') as HTMLHeadingElement;
             const counterbody = document.getElementById('counterbody') as HTMLDivElement;
@@ -105,7 +105,7 @@ function useSocket() {
             } else {
                 setIsEditor(false);
                 timer.style.display = 'none';
-                seconds.innerHTML = '180';
+                seconds.innerHTML = '120';
                 const drawarea = document.getElementById('drawarea') as HTMLDivElement;
                 drawarea.style.display = 'none';
                 clearCanvas();
@@ -380,12 +380,8 @@ function useSocket() {
                         });
                     }
                     else {
-                        const timer = document.getElementById('timer') as HTMLHeadingElement;
-                        timer.style.display = 'none';
-                        const drawarea = document.getElementById('drawarea') as HTMLDivElement;
-                        drawarea.style.display = 'none';
                         const seconds = document.getElementById('seconds') as HTMLSpanElement;
-                        seconds.innerHTML = '180';
+                        seconds.innerHTML = '120';
                         clearCanvas();
                     }
                     return (res);

@@ -96,7 +96,7 @@ function socketConnection(server) {
                 clearInterval(roomTimers[secretcode].intervalId);
             }
             roomTimers[secretcode] = {
-                countdownTime: 180,
+                countdownTime: 120,
                 intervalId: null
             };
             roomTimers[secretcode].intervalId = setInterval(async() => {
@@ -104,7 +104,7 @@ function socketConnection(server) {
                     io.to(secretcode).emit('roundtimer', roomTimers[secretcode].countdownTime--);
                 } else {
                     clearInterval(roomTimers[secretcode].intervalId); // Stop the interval when it reaches 0
-                    roomTimers[secretcode].countdownTime = 180;
+                    roomTimers[secretcode].countdownTime = 120;
                     const gameData = await generateWord(secretcode);
                     if (gameData.error) {
                         socket.to(secretcode).emit("notification", `Error, Restart game: ${gameData.error}`);
@@ -140,7 +140,9 @@ function socketConnection(server) {
                 callback(res);
             }
             if (res.ok) {
+                io.to(secretcode).emit("update-gameDetails", res.gameDetails);
                 io.to(secretcode).emit("correct-guess", `${username} guessed correctly, word was: ${word}`);
+                socket.to(secretcode).emit('clear-canvas');
                 
                 clearInterval(roomTimers[secretcode].intervalId);
 

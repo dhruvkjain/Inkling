@@ -1,8 +1,11 @@
-import { createContext, useContext, useState, useRef, ReactNode, MutableRefObject } from "react";
+import { createContext, useContext, useState, useMemo, ReactNode } from "react";
 
 export type player = {
     username: string;
     profilePic: string;
+    score: number;
+    socketId: string;
+    _id: string;
 }
 
 export type gameResponse = {
@@ -10,11 +13,6 @@ export type gameResponse = {
     secretcode?: string;
     players?: [player];
     error?: string;
-}
-
-type Point = {
-    x:number;
-    y:number;
 }
 
 type words = [string] | undefined
@@ -28,10 +26,6 @@ export type GameContextType = {
     setOpenDialog: (open: boolean) => void;
     words: [string] | undefined;
     setWords: (words: words) => void;
-    canvasRef: MutableRefObject<HTMLCanvasElement | null>;
-    prevPoint: MutableRefObject<Point | null>;
-    mouseDown: boolean;
-    setMouseDown: (newValue: boolean) => void;
 }
 type ContextProps = {
     children: ReactNode;
@@ -45,24 +39,21 @@ function GameContextProvider({ children }: ContextProps) {
     const [isEditor, setIsEditor] = useState<boolean>(false);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [words, setWords] = useState<words>(undefined);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const prevPoint = useRef<null | Point>(null);
-    const [mouseDown, setMouseDown] = useState<boolean>(false);
+
+    const gameDetailsMemo = useMemo(
+        () => (gameDetails),[gameDetails]
+    );
 
     return (
         <GameContext.Provider value={{
-            gameDetails,
+            gameDetails:gameDetailsMemo,
             isEditor,
-            setIsEditor,
-            setGameDetails,
             openDialog,
-            setOpenDialog,
             words,
+            setGameDetails,
+            setIsEditor,
+            setOpenDialog,
             setWords,
-            canvasRef,
-            prevPoint,
-            mouseDown,
-            setMouseDown,
         }}>
             {children}
         </GameContext.Provider>

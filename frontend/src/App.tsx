@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { memo } from 'react';
 
 import GameMenu from "./pages/GameMenu.tsx";
 import Account from "./pages/Account.tsx";
@@ -33,13 +34,15 @@ function App() {
           ) : gameDetails?.secretcode !== undefined ? (
             <Navigate to="/game" />
           ) : (
-            <GameMenu />
+              <GameMenu />
           )}
         />
         <Route path="game"
           element={(authUser === undefined || gameDetails?.secretcode === undefined) 
             ? <Navigate to="/"/> 
-            : <Game/>} 
+            : (
+                <Game/>
+            )} 
         />
       </Routes>
       <Toaster className="cursor-grab" />
@@ -48,4 +51,4 @@ function App() {
   )
 }
 
-export default App
+export default memo(App)

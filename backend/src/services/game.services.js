@@ -127,6 +127,7 @@ async function checkGuess(word, secretcode, username) {
             return { error: 'Insufficient data' };
         }
 
+        let gameDetails = null;
         const res = await getData(secretcode);
         if (res == null) {
             const gameExists = await games.findOne({ secretcode: secretcode });
@@ -134,9 +135,23 @@ async function checkGuess(word, secretcode, username) {
                 return { error: "No such game exist" };
             }
             await storeData(secretcode, word);
-            return { ok: gameExists.currentword == word };
+            if(gameExists.currentword == word){
+                gameDetails = await games.findOneAndUpdate(
+                    { secretcode: secretcode, "players.username": username  },
+                    { $inc: { "players.$.score": 10} },
+                    { upsert: false, new: true, }
+                );
+            }
+            return { ok: gameExists.currentword == word, gameDetails: gameDetails };
         }
-        return ({ ok: res==word }); 
+        if(res==word){
+            gameDetails = await games.findOneAndUpdate(
+                { secretcode: secretcode, "players.username": username  },
+                { $inc: { "players.$.score": 10} },
+                { upsert: false, new: true, }
+            );
+        }
+        return ({ ok: res==word, gameDetails:gameDetails }); 
 
     } catch (err) {
         console.log("Error in checkGuess service", err.message);
