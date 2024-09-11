@@ -423,7 +423,11 @@ function useSocket() {
 
     const leaveGame = () => {
         if (!socket) return;
-            
+        
+        if(isEditor){
+            socket.emit('editor-leave-game', joinRoomCode);
+        }
+
         socket.emit('leave-game', joinRoomCode);
         setIsEditor(false);
         setGameDetails(undefined);

@@ -184,6 +184,28 @@ function socketConnection(server) {
             }
         })
 
+        socket.on("editor-leave-game", async(secretcode) => {
+            socket.leave(secretcode);
+            const gameData = await leaveRoom(socket.id, secretcode);
+            if(gameData.creator){
+                socket.to(secretcode).emit("update-gameDetails", gameData);
+                socket.to(secretcode).emit('clear-canvas');
+                
+                clearInterval(roomTimers[secretcode].intervalId);
+
+                const generatedWords = await generateWord(secretcode);
+                if (generatedWords.error) {
+                    socket.to(secretcode).emit("notification", `Error, Restart game: ${generatedWords.error}`);
+                }
+                else {
+                    io.to(generatedWords.to).emit("select-word", generatedWords.words);
+                }
+            }
+            else{
+                io.to(socket.id).emit("notification", generatedWords.error);
+            }
+        })
+
         socket.on("connect_error", (err) => {
             if (err && err.message === "unauthorized event") {
                 socket.disconnect();
