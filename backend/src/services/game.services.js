@@ -77,6 +77,45 @@ async function joinRoom(socketId, username, profilePic, roomId) {
     }
 }
 
+async function leaveRoom(socketId, roomId) {
+    try {
+        if (!socketId || !roomId) {
+            return { error: 'Insufficient data' };
+        }
+        const game = await games.findOne({ secretcode: roomId })
+        if (!game) {
+            return { error: "No such game exist" };
+        }
+        const isGame = await games.findOneAndUpdate(
+            { secretcode: roomId },
+            { $pull: { players: { socketId: socketId } } },
+            { upsert: false, new: true, }
+        );
+
+        if (isGame.players.length == 0) {
+            await games.deleteOne(
+                { secretcode: roomId }
+            );
+            return({})
+        }
+
+        if (isGame) {
+            return {
+                creator: isGame.creator,
+                secretcode: isGame.secretcode,
+                players: isGame.players,
+            };
+        }
+        
+        else {
+            return { error: "Can't leave game" };
+        }
+    } catch (err) {
+        console.log("Error in leave game service", err.message);
+        return { error: "Internal Server error" };
+    }
+}
+
 async function generateWord(secretcode) {
     try {
         if (!secretcode) {
@@ -159,39 +198,11 @@ async function checkGuess(word, secretcode, username) {
     }
 }
 
-async function disconnected(socketId, secretcode) {
-    try {
-        if (!socketId || !secretcode) {
-            return { error: 'Insufficient data' };
-        }
-        if (!socketId) {
-            return { error: 'No Socket Id provided' };
-        }
-        const isGame = await games.findOneAndUpdate(
-            { secretcode: secretcode },
-            { $pull: { players: { socketId: socketId } } },
-            { upsert: false, new: true, }
-        );
-
-        if (!isGame) {
-            return;
-        }
-
-        if (isGame.players.length == 0) {
-            await games.deleteOne(
-                { secretcode: secretcode }
-            );
-        }
-    } catch (err) {
-        console.log("Error in disconnect service", err.message);
-        return { error: "Internal Server error" };
-    }
-}
 
 module.exports = {
     createRoom,
     joinRoom,
-    disconnected,
+    leaveRoom,
     generateWord,
     setCurrentWord,
     checkGuess,

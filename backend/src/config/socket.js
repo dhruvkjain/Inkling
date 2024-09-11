@@ -3,7 +3,7 @@ const { Server } = require('socket.io');
 
 const { verifyToken } = require('../utils');
 const games = require('../models/game.model.js');
-const { createRoom, joinRoom, disconnected, generateWord, setCurrentWord, checkGuess } = require('../services/game.services.js');
+const { createRoom, joinRoom, leaveRoom, generateWord, setCurrentWord, checkGuess } = require('../services/game.services.js');
 
 function socketConnection(server) {
 
@@ -173,8 +173,16 @@ function socketConnection(server) {
             console.log(`disconnected bcz ${reason}, ${socket.id}`);
         });
 
-        socket.on("leave-game", (secretcode) => {
-            disconnected(socket.id, secretcode);
+        socket.on("leave-game", async(secretcode) => {
+            socket.leave(secretcode);
+            clearInterval(roomTimers[secretcode].intervalId);
+            const gameData = await leaveRoom(socket.id, secretcode);
+            if(gameData.creator){
+                socket.to(secretcode).emit("update-gameDetails", gameData);
+            }
+            else{
+                io.to(socket.id).emit("notification", gameData.error);
+            }
         })
 
         socket.on("connect_error", (err) => {

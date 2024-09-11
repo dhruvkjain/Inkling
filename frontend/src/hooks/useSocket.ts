@@ -25,6 +25,7 @@ export type guessResponse = {
 // we want to persist data in a variable and not redeclare them.
 let socket: Socket;
 let joinRoomCode: string | undefined;
+let flag2 = 0;
 
 function useSocket() {
 
@@ -32,7 +33,6 @@ function useSocket() {
     const { setGameDetails, setOpenDialog, setWords, setIsEditor, isEditor } = useGameContext() as GameContextType;
     const { clearCanvas, canvasRef } = useDraw(drawLine, clearAllCanvas);
 
-    let flag2 = 0;
     const createSocketConnection = () => {
         if (socket) return;   // Prevent re-initialization
         socket = io('http://localhost:3000', {
@@ -66,7 +66,6 @@ function useSocket() {
                 const counterInput = document.getElementById('counter') as HTMLSpanElement;
                 counterInput.innerHTML = (time).toString();
             } else {
-                console.log('round start');
                 counterbody.style.display = 'none';
                 drawarea.style.display = 'block';
                 const b1w = document.getElementById('drawarea')?.offsetWidth;
@@ -330,7 +329,6 @@ function useSocket() {
                         description: dateString
                     });
                     setOpenDialog(false);
-
                     socket.emit('start-round-timer', joinRoomCode);
                     return ({});
                 }
@@ -423,6 +421,15 @@ function useSocket() {
         socket.emit('clear-canvas', joinRoomCode);
     }
 
+    const leaveGame = () => {
+        if (!socket) return;
+            
+        socket.emit('leave-game', joinRoomCode);
+        setIsEditor(false);
+        setGameDetails(undefined);
+        flag2 = 0;
+    }
+
     const returnCode = () => {
         if (!socket) {
             return undefined;
@@ -440,6 +447,7 @@ function useSocket() {
         submitGuess,
         drawLine,
         clearAllCanvas,
+        leaveGame,
         returnCode
     }
 }

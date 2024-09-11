@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { TrophyIcon, UsersIcon } from "../components/Icons.tsx";
 import {
   AlertDialog,
@@ -24,7 +23,7 @@ function Game() {
   const { gameDetails, openDialog, setOpenDialog, words, isEditor } = useGameContext() as GameContextType;
   const { authUser } = useAuthContext() as AuthContextType;
   const navigate = useNavigate();
-  const { selectedWord, submitGuess, drawLine, clearAllCanvas } = useSocket();
+  const { selectedWord, submitGuess, drawLine, clearAllCanvas, leaveGame } = useSocket();
   
   const { canvasRef, onMouseDown, clearCanvasForAll } = useDraw(drawLine, clearAllCanvas);
 
@@ -35,7 +34,7 @@ function Game() {
   }, []);
 
   async function sendSelectedWord(word:string){
-    console.log(word);
+    // console.log(word);
     const res:errorMessage = await selectedWord(word);
     if(res.error) {
       return;
@@ -81,7 +80,7 @@ function Game() {
                 <h2 className="text-xl font-bold mb-4">Drawing Canvas</h2>
               </div>
               <div className="w-full text-xl font-bold mb-4">
-                <div id='timer' className="w-full">
+                <div id='timer' className="hidden w-full">
                   <div className='flex justify-end w-full pl-[100px]'>
                     <h2>Time left: <span id='seconds'>120</span>s</h2>
                     {
@@ -122,10 +121,10 @@ function Game() {
                           </Avatar>
                           <div>
                             <p className="font-medium">{player.username}</p>
-                            <p className="text-muted-foreground text-sm">Guessed: "Flower"</p>
+                            <p className="text-muted-foreground text-sm">Score :{player.score}</p>
                           </div>
                         </div>
-                        <Badge variant="outline">Correct</Badge>
+                        {/* <Badge variant="outline">Correct</Badge> */}
                       </div>
                     )
                   })
@@ -164,7 +163,7 @@ function Game() {
           <div>
             <p className='text-xl'><span className='font-bold'>Room Code: </span>{gameDetails?.secretcode}</p>
           </div>
-          <Button className='font-medium text-xl' variant="link" >Leave Game</Button>
+          <Button onClick={()=>{leaveGame()}} className='font-medium text-xl' variant="link" >Leave Game</Button>
         </div>
       </footer>
     </div>
