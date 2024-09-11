@@ -175,7 +175,6 @@ function socketConnection(server) {
 
         socket.on("leave-game", async(secretcode) => {
             socket.leave(secretcode);
-            clearInterval(roomTimers[secretcode].intervalId);
             const gameData = await leaveRoom(socket.id, secretcode);
             if(gameData.creator){
                 socket.to(secretcode).emit("update-gameDetails", gameData);
