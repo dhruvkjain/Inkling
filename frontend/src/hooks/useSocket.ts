@@ -427,8 +427,10 @@ function useSocket() {
         if(isEditor){
             socket.emit('editor-leave-game', joinRoomCode);
         }
+        else{
+            socket.emit('leave-game', joinRoomCode);
+        }
 
-        socket.emit('leave-game', joinRoomCode);
         setIsEditor(false);
         setGameDetails(undefined);
         flag2 = 0;
