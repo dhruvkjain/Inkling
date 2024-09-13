@@ -2,6 +2,7 @@
 import { toast } from "sonner";
 import { date } from "../utils/date.ts";
 import { io, Socket } from 'socket.io-client';
+import { z } from 'zod';
 
 import { useAuthContext, AuthContextType } from "../context/AuthContext.tsx";
 import { gameResponse, useGameContext, GameContextType } from "../context/GameContext.tsx";
@@ -26,6 +27,8 @@ export type guessResponse = {
 let socket: Socket;
 let joinRoomCode: string | undefined;
 let flag2 = 0;
+const roomIdSchema = z.string().uuid({message: "Invalid Join Room Code"});
+const wordSchema = z.string({message: "Enter valid word"});
 
 function useSocket() {
 
@@ -234,6 +237,16 @@ function useSocket() {
                 return;
             }
 
+            const zodResults = roomIdSchema.safeParse(roomId);
+            if(!zodResults.success){
+                const { dateString } = date();
+                toast(`Failed to Create Room : ${zodResults.error.format()._errors[0]}`, {
+                    description: dateString
+                });
+                resolve({ error: `${zodResults.error.format()._errors[0]}` });
+                return;
+            }
+
             socket.emit('join-room', authUser.username, authUser.profilePic, roomId, (res: gameResponse) => {
                 if (res.error) {
                     const { dateString } = date();
@@ -350,6 +363,16 @@ function useSocket() {
                     description: dateString
                 });
                 resolve({ error: "No Auth User" });
+                return;
+            }
+
+            const zodResults = wordSchema.safeParse(word);
+            if(!zodResults.success){
+                const { dateString } = date();
+                toast(`Failed to submit word : ${zodResults.error.format()._errors[0]}`, {
+                    description: dateString
+                });
+                resolve({ error: `${zodResults.error.format()._errors[0]}` });
                 return;
             }
 
