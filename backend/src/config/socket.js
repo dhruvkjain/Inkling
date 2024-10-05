@@ -22,7 +22,7 @@ function socketConnection(server) {
     const roomTimers = {}; // Storing all Timeout objects of setIntervals.
 
     io.use((socket, next) => {
-        console.log(socket.request.headers.cookie);
+        // console.log(socket.request.headers.cookie);
         const cookies = socket.request.headers.cookie;
         let token;
         cookies.split(';').forEach((ck) => {
