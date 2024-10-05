@@ -30,7 +30,7 @@ function GameMenu() {
     if(!roomcode.error){
       setTimeout(async()=>{
         await generateWord();
-      }, 5000);
+      }, 20000);
       (async()=>{
         await startcountdown();
       })()
