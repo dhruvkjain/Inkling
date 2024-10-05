@@ -7,13 +7,13 @@ const fs = require('fs');
 const cookieParser = require('cookie-parser');
 
 app.use(cors({
-  origin:'http://localhost:5173',
+  origin:'https://inkling-sigma.vercel.app/',
   credentials: true, // enable credentials
 }));
 app.use(express.json());
 app.use(cookieParser());
 // TODO : change logs file name before production.
-var accessLogStream = fs.createWriteStream('./devlogs.txt', { flags: 'a' })
+var accessLogStream = fs.createWriteStream('./prodlogs.txt', { flags: 'a' })
 app.use(morgan('combined' , { stream: accessLogStream }));
 
 const { authRouter } = require('./routes/auth.routes.js');

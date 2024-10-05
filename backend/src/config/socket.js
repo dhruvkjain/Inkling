@@ -9,7 +9,7 @@ function socketConnection(server) {
 
     const io = new Server(server, {
         cors: {
-            origin: ['http://localhost:5173', 'https://admin.socket.io/', 'https://admin.socket.io/#/'],
+            origin: ['https://inkling-sigma.vercel.app/', 'https://admin.socket.io/', 'https://admin.socket.io/#/'],
             credentials: true, // enable credentials
         }
     });
