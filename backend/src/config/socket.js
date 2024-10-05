@@ -202,7 +202,7 @@ function socketConnection(server) {
                 }
             }
             else{
-                io.to(socket.id).emit("notification", generatedWords.error);
+                io.to(socket.id).emit("notification", `Left ${secretcode} game !!!`);
             }
         })
 
