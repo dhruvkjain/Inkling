@@ -9,7 +9,7 @@ function socketConnection(server) {
 
     const io = new Server(server, {
         cors: {
-            origin: ['https://inkling-sigma.vercel.app/', 'https://admin.socket.io/', 'https://admin.socket.io/#/'],
+            origin: ['https://inkling-sigma.vercel.app', 'https://admin.socket.io/', 'https://admin.socket.io/#/'],
             credentials: true, // enable credentials
         }
     });
@@ -22,7 +22,7 @@ function socketConnection(server) {
     const roomTimers = {}; // Storing all Timeout objects of setIntervals.
 
     io.use((socket, next) => {
-        // console.log(socket.request.headers.cookie);
+        console.log(socket.request.headers.cookie);
         const cookies = socket.request.headers.cookie;
         let token;
         cookies.split(';').forEach((ck) => {
