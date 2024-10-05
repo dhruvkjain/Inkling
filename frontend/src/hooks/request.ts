@@ -1,4 +1,4 @@
-const APT_URL = 'http://localhost:3000/api/auth'
+const APT_URL = 'https://inkling-latest.onrender.com/api/auth'
 
 type signupdetails = {
     fullName: string | undefined,
