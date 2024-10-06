@@ -38,7 +38,7 @@ function useSocket() {
 
     const createSocketConnection = () => {
         if (socket) return;   // Prevent re-initialization
-        socket = io('https://inkling-latest.onrender.com', {
+        socket = io(`${process.env.SERVER_URL}`, {
             withCredentials: true // to pass cookies to socket
         });
 

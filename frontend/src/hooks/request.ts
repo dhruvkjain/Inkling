@@ -1,4 +1,4 @@
-const APT_URL = 'https://inkling-latest.onrender.com/api/auth'
+const APT_URL = `${process.env.SERVER_URL}/api/auth`
 
 type signupdetails = {
     fullName: string | undefined,
