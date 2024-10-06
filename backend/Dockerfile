@@ -1,10 +1,12 @@
-FROM node:20
+FROM node:20-alpine
 
 WORKDIR /usr/src/inkling
 
-COPY . .
+COPY package* .
 
 RUN npm install
+
+COPY . .
 
 WORKDIR /usr/src/inkling/src
 
