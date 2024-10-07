@@ -1,5 +1,4 @@
 const APT_URL = `${import.meta.env.VITE_SERVER_URL}/api/auth`
-console.log(APT_URL);
 
 type signupdetails = {
     fullName: string | undefined,
