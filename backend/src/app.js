@@ -7,7 +7,7 @@ const fs = require('fs');
 const cookieParser = require('cookie-parser');
 
 app.use(cors({
-  origin:'https://inkling-sigma.vercel.app',
+  origin: process.env.CLIENT_URL,
   credentials: true, // enable credentials
 }));
 app.use(express.json());
