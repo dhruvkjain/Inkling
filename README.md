@@ -1,7 +1,7 @@
 > App is currently in construction.
 
 <p align="center">
-    <img src="https://github.com/user-attachments/assets/a8eb0207-6484-497f-8564-ce582dd94428" style="border-radius: 25px;"/>
+    <img src="https://github.com/user-attachments/assets/8c567ec4-b789-4c8e-addf-f1256e46427e" style="border-radius: 25px;"/>
 </p>
 
 
@@ -17,8 +17,7 @@
 Contents
 ========
 - [Tech Stack](#tech-stack)
-- [Installation(without Docker)](#installationwithout-docker)
-- [Installation(with Docker)](#installationwith-docker)
+- [Installation](#installation)
 - [Frontend Deployment to Vercel](#frontend-deployment-to-vercel)
 - [Backend Deployment to Render](#backend-deployment-to-render)
 
@@ -34,9 +33,9 @@ Contents
  - Knip
  - Socket.io
  - Husky
- - Docker
+ - Docker (optional)
 
-### Installation(without Docker)
+### Installation
 1. Clone the repo
   ```bash
   git clone
@@ -60,12 +59,65 @@ Contents
     ```bash
     npm install
     ```
+    3. Create a .env file 
+    ```bash
+    touch .env
+    ```
+    4. Add server url
+    ```.env
+    VITE_SERVER_URL=http://localhost:3000
+    ```
     3. Run the development server
     ```bash
     npm run dev
     ```
 
-- Backend
+- Backend (with docker)
+
+    1. Move to backend
+    ```bash
+    cd backend
+    ```
+    2. Pull the docker container
+    ```bash
+    docker pull immortalnova/inkling
+    ```
+    3. Create a .env file 
+    ```bash
+    touch .env
+    ```
+    4. Add the below to .env file
+    ```.env
+    NODE_ENV=development
+    ```
+    5. Create a MongoDB database and add your Mongo URL to .env file
+    ```.env
+    MONGO_URL=mongodb+srv://.....
+    ```
+    6. Generate a random secret key for digital signing (run in terminal) :
+    ```bash
+    openssl rand -base64 32
+    ```
+    7. Add your secret key used to hash JWT tokens
+    ```.env
+    JWT_SECRET=secret_key.....
+    ```
+    8. Create a Redis Cloud account and add your Redis details to .env file
+    ```.env
+    REDIS_PASSWORD=password.....
+    REDIS_HOST=redis-something.....redis-cloud.com
+    REDIS_PORT=xxxxx
+    ```
+    9. Add client url
+    ```.env
+    CLIENT_URL=http://localhost:5173
+    ```
+    10. Run an image locally *(with env variables)*:
+    ```bash
+    docker run --env-file ./.env -p 3000:3000 immortalnova/inkling
+    ```
+
+- Backend (without docker)
 
     1. Move to backend
     ```bash
@@ -91,30 +143,27 @@ Contents
     ```bash
     openssl rand -base64 32
     ```
-    3. Add your secret key used to hash JWT tokens
+    7. Add your secret key used to hash JWT tokens
     ```.env
     JWT_SECRET=secret_key.....
     ```
-    3. Create a Redis Cloud account and add your Redis details to .env file
+    8. Create a Redis Cloud account and add your Redis details to .env file
     ```.env
     REDIS_PASSWORD=password.....
     REDIS_HOST=redis-something.....redis-cloud.com
     REDIS_PORT=xxxxx
     ```
+    9. Add client url
+    ```.env
+    CLIENT_URL=http://localhost:5173
+    ```
+    10. Run development server:
+    ```bash
+    npm run dev
+    ```
 
 
 ### Frontend Deployment to Vercel
+### Backend Deployment to Render
 
 <a href="https://inkling-sigma.vercel.app/"><img src="https://vercel.com/button" alt="Deploy with Vercel"/></a>
-
-**Deployment Steps**
-
-1. Press the button above to deploy to **Vercel**.
-2. Add the following environment variables in the Vercel dashboard.
-   1. **NEXT_PUBLIC_ID** - Your Login Username
-   2. **NEXT_PUBLIC_PASSWORD** - Your Login Password
-3. Connect Postgres database to your Vercel project. Follow [this](https://vercel.com/docs/storage/vercel-postgres/quickstart) guide.
-4. All done! 🎉
-5. (Optional) If you want to use your own domain, follow [this](https://vercel.com/guides/how-do-i-add-a-custom-domain-to-my-vercel-project) guide.
-
-### Backend Deployment to Render
