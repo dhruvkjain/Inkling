@@ -41,7 +41,7 @@ Contents
 ### Architecture
 
 <p align="center">
-    <img src="https://github.com/user-attachments/assets/8dfb7a25-625d-42cb-8069-ff719c41a4db" style="height: 400px;width: fit-content;border-radius: 0px;"/>
+    <img src="https://github.com/user-attachments/assets/8dfb7a25-625d-42cb-8069-ff719c41a4db" style="height: fit-content;width: fit-content;border-radius: 0px;"/>
 </p>
 
 ---
