@@ -17,6 +17,7 @@
 Contents
 ========
 - [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
 - [Installation](#installation)
 - [Frontend Deployment to Vercel](#frontend-deployment-to-vercel)
 - [Backend Deployment to Render](#backend-deployment-to-render)
@@ -34,6 +35,16 @@ Contents
  - Socket.io
  - Husky
  - Docker (optional)
+
+---
+
+### Architecture
+
+<p align="center">
+    <img src="https://github.com/user-attachments/assets/8dfb7a25-625d-42cb-8069-ff719c41a4db" style="height: 400px;width: fit-content;border-radius: 0px;"/>
+</p>
+
+---
 
 ### Installation
 1. Clone the repo
@@ -162,7 +173,7 @@ Contents
     npm run dev
     ```
 
-
+---
 ### Frontend Deployment to Vercel
 ### Backend Deployment to Render
 
