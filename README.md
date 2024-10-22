@@ -44,6 +44,34 @@ Contents
     <img src="https://github.com/user-attachments/assets/8dfb7a25-625d-42cb-8069-ff719c41a4db" style="height: fit-content;width: fit-content;border-radius: 0px;"/>
 </p>
 
+```
+├── 📁.husky                   # Git hooks for pre-commit checks  
+├── 📁backend                  # Backend logic with API, models, services, and configurations  
+│   ├── 📁src                  # Source code for the backend  
+│   |   ├── 📁config               # Configuration for MongoDB, Redis, and Socket.IO  
+│   |   ├── 📁models               # MongoDB models for User and Game  
+│   |   ├── 📁routes               # API routes (Auth) with controllers
+│   |   ├── 📁utils                # Utility functions like JWT and hashing 
+│   |   ├── 📁services             # Service logic (e.g., game services) 
+│   |   ├── server.js          # Server entry point  
+│   |   └── app.js             # Creating an express instance
+│   ├── Dockerfile             # Docker configuration
+│   ├── knip.config.js         # Knip configurations
+│   └── docker-compose.yml     # Multi-container Docker setup  
+├── 📁frontend                 # Frontend code using Vite + React + Typescript with Tailwind CSS  
+│   ├── 📁@                    # ShadcnUI components and utility libraries  
+│   ├── 📁public               # Public assets  
+│   ├── 📁src                      # Source code for frontend app  
+│   |   ├── 📁context              # React contexts (Auth, Canvas, Game)  
+│   |   ├── 📁hooks                # Custom hooks for API requests and sockets  
+│   |   ├── 📁pages                # Application pages like Account and Game  
+│   |   └── 📁utils                # Helper functions (e.g., date and drawing utilities)
+│   ├── tailwind.config.js     # Tailwind CSS configuration  
+│   ├── tsconfig.json          # TypeScript configuration  
+│   └── vite.config.ts         # Vite configuration  
+└── .gitignore                 # Files to be ignored by Git  
+```
+
 ---
 
 ### Installation
