@@ -61,7 +61,7 @@ Contents
 ├── 📁frontend                 # Frontend code using Vite + React + Typescript with Tailwind CSS  
 │   ├── 📁@                    # ShadcnUI components and utility libraries  
 │   ├── 📁public               # Public assets  
-│   ├── 📁src                      # Source code for frontend app  
+│   ├── 📁src                  # Source code for frontend app  
 │   |   ├── 📁context              # React contexts (Auth, Canvas, Game)  
 │   |   ├── 📁hooks                # Custom hooks for API requests and sockets  
 │   |   ├── 📁pages                # Application pages like Account and Game  
